@@ -56,7 +56,9 @@ public class BasicBacktrackColorer implements GraphColorer
 
     Map<String, ColorableNode> buildMap = new HashMap<String, ColorableNode>(arr.length);
 
-    for (int i = 0; i < arr.length; i++)
+    int k = 0;
+
+    for (int i = 0; i < spec.NodeCount; i++)
     {
       final String nodeId = spec.Nodes.get(i);
       ColorableNode node;
@@ -68,7 +70,7 @@ public class BasicBacktrackColorer implements GraphColorer
       else
       {
         node = new ColorableNode() {{ Id = nodeId; }};
-        arr[i] = node;
+        arr[k++] = node;
         buildMap.put(nodeId, node);
       }
 
@@ -77,11 +79,15 @@ public class BasicBacktrackColorer implements GraphColorer
 
       for (int j = 0; j < edges.length; j++)
       {
-        String neighborId = specEdges.get(j);
+        final String neighborId = specEdges.get(j);
+
         if (!buildMap.containsKey(neighborId))
         {
-          buildMap.put(neighborId, new ColorableNode());
+          ColorableNode newNode = new ColorableNode() {{ Id = neighborId; }};
+          buildMap.put(neighborId, newNode);
+          arr[k++] = newNode;
         }
+
         edges[j] = buildMap.get(neighborId).Node;
       }
 
@@ -126,6 +132,7 @@ public class BasicBacktrackColorer implements GraphColorer
       while (arr[k].Node.get() <= 2)
       {
         arr[k].Node.set(arr[k].Node.get() + 1);
+
         if (isColoringValid(arr))
         {
           isColored = true;
@@ -135,7 +142,6 @@ public class BasicBacktrackColorer implements GraphColorer
         if (k < (arr.length - 1))
         {
           k++;
-          break;
         }
         else
         {
