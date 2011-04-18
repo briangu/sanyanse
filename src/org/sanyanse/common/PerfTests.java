@@ -1,7 +1,7 @@
 package org.sanyanse.common;
 
 
-import org.sanyanse.colorer.BacktrackColorer;
+import org.sanyanse.colorer.BetterBacktrackColorer;
 import org.sanyanse.colorer.MultiColorer;
 import org.sanyanse.colorer.WaveColorer;
 import org.sanyanse.loader.MemoryLoader;
@@ -152,7 +152,7 @@ public class PerfTests
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
     colorers.add(new WaveColorer(graphSpec));
-    colorers.add(new BacktrackColorer(graphSpec));
+    colorers.add(new BetterBacktrackColorer(graphSpec));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new SimpleThreadFactory());
     MultiColorer mc = MultiColorer.create(executor, colorers);

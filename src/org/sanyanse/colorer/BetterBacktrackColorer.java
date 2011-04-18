@@ -8,11 +8,11 @@ import org.sanyanse.common.GraphSpec;
 import java.util.*;
 
 
-public class BacktrackColorer implements GraphColorer
+public class BetterBacktrackColorer implements GraphColorer
 {
   GraphSpec _spec;
 
-  public BacktrackColorer(GraphSpec spec)
+  public BetterBacktrackColorer(GraphSpec spec)
   {
     _spec = spec;
   }
@@ -55,7 +55,7 @@ public class BacktrackColorer implements GraphColorer
 
         Boolean haveValidColor = true;
 
-        List<StackNode> nextNodes = new ArrayList<StackNode>(neighbors.size() + 1) {{ add(node); }};
+        List<StackNode> nextNodes = null;
 
         for (String neighbor : neighbors) {
           if (colorings.containsKey(neighbor)) {
@@ -66,13 +66,20 @@ public class BacktrackColorer implements GraphColorer
           }
           else
           {
+            if (nextNodes == null)
+            {
+              nextNodes = new ArrayList<StackNode>(neighbors.size() + 1) {{ add(node); }};
+            }
             nextNodes.add(new StackNode(neighbor, Arrays.asList(colorChoiceMap.get(color)).iterator()));
           }
         }
 
         if (haveValidColor) {
           colorings.put(node.Id, color);
-          stack.addAll(nextNodes);
+          if (nextNodes != null)
+          {
+            stack.addAll(nextNodes);
+          }
           break;
         }
       }
