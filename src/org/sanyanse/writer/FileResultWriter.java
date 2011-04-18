@@ -1,4 +1,4 @@
-package org.sanyanse;
+package org.sanyanse.writer;
 
 
 import org.sanyanse.common.ColoringResult;

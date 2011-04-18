@@ -1,4 +1,4 @@
-package org.sanyanse;
+package org.sanyanse.writer;
 
 
 import org.sanyanse.common.ColoringResult;
@@ -19,7 +19,7 @@ public class StdoutResultWriter implements ColoringResultWriter
 
   public void write() {
 
-    System.out.print(String.format("%s", Boolean.toString(_result.IsColored)));
+    System.out.println(String.format("%s", Boolean.toString(_result.IsColored)));
 
     if (_result.IsColored) {
       for (ColoringResult.Coloring coloring : _result.Colorings) {

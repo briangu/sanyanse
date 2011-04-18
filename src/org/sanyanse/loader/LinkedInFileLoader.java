@@ -1,11 +1,11 @@
-package org.sanyanse;
+package org.sanyanse.loader;
 
 
 import org.sanyanse.common.GraphLoader;
 import org.sanyanse.common.GraphSpec;
 
 
-public class FileLoader implements GraphLoader
+public class LinkedInFileLoader implements GraphLoader
 {
   private String _filename;
 
@@ -20,7 +20,7 @@ public class FileLoader implements GraphLoader
   // EDGE LIST: <NODE ID>,<NODE ID>, ... ,<NODE ID>
 
   public static GraphLoader create(String filename) {
-    FileLoader loader = new FileLoader();
+    LinkedInFileLoader loader = new LinkedInFileLoader();
     loader._filename = filename;
     return loader;
   }

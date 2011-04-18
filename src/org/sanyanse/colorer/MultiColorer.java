@@ -1,4 +1,4 @@
-package org.sanyanse;
+package org.sanyanse.colorer;
 
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package org.sanyanse;
+package org.sanyanse.loader;
 
 
 import org.sanyanse.common.GraphLoader;

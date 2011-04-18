@@ -1,4 +1,4 @@
-package org.sanyanse;
+package org.sanyanse.colorer;
 
 
 import org.sanyanse.common.ColoringResult;
@@ -58,10 +58,11 @@ public class BacktrackColorer implements GraphColorer
         List<StackNode> nextNodes = new ArrayList<StackNode>(neighbors.size() + 1) {{ add(node); }};
 
         for (String neighbor : neighbors) {
-          if (colorings.containsKey(neighbor))
+          if (colorings.containsKey(neighbor)) {
             if (colorings.get(neighbor) == color) {
-            haveValidColor = false;
-            break;
+              haveValidColor = false;
+              break;
+            }
           }
           else
           {
