@@ -19,6 +19,7 @@ public class WaveColorer implements GraphColorer
       throws Exception
   {
     Thread.sleep(10000);
-    return new ColoringResult(false);
+    ColoringResult result = ColoringResult.createNotColorableResult();
+    return result;
   }
 }

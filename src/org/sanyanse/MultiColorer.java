@@ -3,13 +3,8 @@ package org.sanyanse;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
+
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.GraphColorer;
 
@@ -17,9 +12,11 @@ import org.sanyanse.common.GraphColorer;
 public class MultiColorer implements GraphColorer
 {
   List<GraphColorer> _colorers;
+  Executor _exec;
 
-  private MultiColorer(List<GraphColorer> colorers)
+  private MultiColorer(Executor e, List<GraphColorer> colorers)
   {
+    _exec = e;
     _colorers = colorers;
   }
 
@@ -27,8 +24,7 @@ public class MultiColorer implements GraphColorer
   public ColoringResult call()
       throws Exception
   {
-    Executor e = Executors.newCachedThreadPool();
-    ColoringResult result = color(e, _colorers);
+    ColoringResult result = color(_exec, _colorers);
     return result;
   }
 
@@ -77,8 +73,8 @@ public class MultiColorer implements GraphColorer
     return result;
   }
 
-  public static MultiColorer create(List<GraphColorer> colorers)
+  public static MultiColorer create(Executor e, List<GraphColorer> colorers)
   {
-    return new MultiColorer(colorers);
+    return new MultiColorer(e, colorers);
   }
 }

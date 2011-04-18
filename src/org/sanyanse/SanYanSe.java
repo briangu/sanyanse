@@ -5,6 +5,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.ColoringResultWriter;
 import org.sanyanse.common.GraphColorer;
@@ -39,7 +44,7 @@ public class SanYanSe
     }
   }
 
-  public static void main(String[] args) {
+  public static void mainTest(String[] args) {
     testfloats();
     testLongs();
     testBoxedLongs();
@@ -122,7 +127,22 @@ public class SanYanSe
     System.out.print("\n");
   }
 
-  public static void main2(String[] args)
+  static class SimpleThreadFactory implements ThreadFactory, Thread.UncaughtExceptionHandler
+  {
+    public Thread newThread(Runnable r) {
+      Thread t = new Thread(r);
+      t.setUncaughtExceptionHandler(this);
+      return t;
+    }
+
+    @Override
+    public void uncaughtException(Thread thread, Throwable throwable)
+    {
+      System.out.print(throwable.toString());
+    }
+  }
+
+  public static void main(String[] args)
   {
     GraphLoader loader;
 
@@ -134,26 +154,29 @@ public class SanYanSe
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
     colorers.add(new WaveColorer(graphSpec));
-//    colorers.add(new BacktrackColorer(graphSpec));
+    colorers.add(new BacktrackColorer(graphSpec));
 
-    MultiColorer mc = MultiColorer.create(colorers);
+    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new SimpleThreadFactory());
+    MultiColorer mc = MultiColorer.create(executor, colorers);
 
     try
     {
       ColoringResult result = mc.call();
       if (result == null)
       {
-        result = new ColoringResult(false);
+        result = ColoringResult.createNotColorableResult();
       }
 
       String outfileName = String.format("%s_%s_out", "sanyanse", graphName);
-      ColoringResultWriter writer = FileResultWriter.create(outfileName, result);
+      ColoringResultWriter writer = StdoutResultWriter.create(outfileName, result);
       writer.write();
     }
     catch (Exception e)
     {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
     }
+
+    executor.shutdown();
   }
 
   static float[][][] buildArray() {
