@@ -2,8 +2,10 @@ package org.sanyanse.colorer;
 
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphSpec;
@@ -97,37 +99,25 @@ public class BasicBacktrackColorer implements GraphColorer
     return arr;
   }
 
-  static boolean isColoringValid(ColorableNode[] arr)
+  enum ColorState
   {
-    for (int i = 0; i < arr.length; i++)
-    {
-      long color = arr[i].Node.get();
-
-      if (color == 0) return false;
-
-      SettableInteger[] row = arr[i].Edges;
-
-      // TODO: explore leveraging undirected nature of connection matrix
-
-      for (int x = 0; x < row.length; x++)
-      {
-        if (row[x].get() == color)
-        {
-          return false;
-        }
-      }
-    }
-
-    return true;
+    Complete,
+    PartialValid,
+    Invalid
   }
 
-  private boolean isPartial(ColorableNode[] arr)
+  private ColorState analyzeSolution(ColorableNode[] arr)
   {
-    for (int i = 0; i < arr.length; i++)
+    ColorState state = BasicBacktrackColorer.ColorState.Complete;
+
+    for (int i = arr.length - 1; i >= 0; i--)
     {
       long color = arr[i].Node.get();
-
-      if (color == 0) continue;
+      if (color == 0)
+      {
+        state = BasicBacktrackColorer.ColorState.PartialValid;
+        continue;
+      }
 
       SettableInteger[] row = arr[i].Edges;
 
@@ -137,12 +127,12 @@ public class BasicBacktrackColorer implements GraphColorer
       {
         if (row[x].get() == color)
         {
-          return false;
+          return BasicBacktrackColorer.ColorState.Invalid;
         }
       }
     }
 
-    return true;
+    return state;
   }
 
   @Override
@@ -150,30 +140,32 @@ public class BasicBacktrackColorer implements GraphColorer
   {
     final ColorableNode[] arr = buildColoringArray(_spec);
 
-    boolean isColored = isColoringValid(arr);
+    boolean isColored = false;
 
     int k = 0;
 
     while ((k >= 0) && !isColored)
     {
-      while (arr[k].Node.get() <= 3)
+      while ((arr[k].Node.get() <= 3))
       {
         arr[k].Node.set(arr[k].Node.get() + 1);
 
-        if (isColoringValid(arr))
+        ColorState state = analyzeSolution(arr);
+        if (state == ColorState.Complete)
         {
           isColored = true;
           break;
         }
-
-        if (isPartial(arr))
+        if (state == ColorState.PartialValid)
         {
           k++;
+          System.out.println(k);
         }
       }
 
       if (!isColored)
       {
+        System.out.println(k);
         arr[k].Node.set(0);
         k--;
       }
@@ -185,6 +177,20 @@ public class BasicBacktrackColorer implements GraphColorer
         : ColoringResult.createNotColorableResult();
 
     return result;
+  }
+
+  Set<Integer> _colors = new HashSet<Integer>() {{ add(1); add(2); add(3); }};
+
+  private Set<Integer> getViableColors(SettableInteger[] edges)
+  {
+    Set<Integer> colors = new HashSet<Integer>(_colors);
+
+    for (SettableInteger si : edges)
+    {
+      colors.remove(si.get());
+    }
+
+    return colors;
   }
 
   private ColoringResult createResult(ColorableNode[] arr)

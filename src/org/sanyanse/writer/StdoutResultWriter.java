@@ -11,24 +11,18 @@ import org.sanyanse.common.ColoringResultWriter;
  */
 public class StdoutResultWriter implements ColoringResultWriter
 {
-  ColoringResult _result;
+  public void write(ColoringResult result) {
 
-  StdoutResultWriter(ColoringResult result) {
-    _result = result;
-  }
+    System.out.println(String.format("%s", Boolean.toString(result.IsColored)));
 
-  public void write() {
-
-    System.out.println(String.format("%s", Boolean.toString(_result.IsColored)));
-
-    if (_result.IsColored) {
-      for (ColoringResult.Coloring coloring : _result.Colorings) {
+    if (result.IsColored) {
+      for (ColoringResult.Coloring coloring : result.Colorings) {
         System.out.println(String.format("%s:%s", coloring.NodeId, coloring.Color));
       }
     }
   }
 
-  public static StdoutResultWriter create(String filename, ColoringResult result) {
-    return new StdoutResultWriter(result);
+  public static StdoutResultWriter create() {
+    return new StdoutResultWriter();
   }
 }

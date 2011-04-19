@@ -1,8 +1,10 @@
 package org.sanyanse.loader;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -40,10 +42,11 @@ public class RandomGraphLoader implements GraphLoader
 
     int nodeCnt = Math.max(rnd.nextInt(_maxNodes), _minNodes);
 
+    List<String> nodeOrder = new ArrayList<String>(nodeCnt);
     Map<String, Set<String>> buildMap = new HashMap<String, Set<String>>();
 
     for (int i = 1; i <= nodeCnt; i++) {
-      int neighborCnt = Math.max(rnd.nextInt(Math.min(3, nodeCnt)), 1);
+      int neighborCnt = Math.max(rnd.nextInt(Math.min(2, nodeCnt)), 1);
 
       Set<String> neighbors = new HashSet<String>(neighborCnt);
       for (int n = 0; n < neighborCnt; n++) {
@@ -53,6 +56,7 @@ public class RandomGraphLoader implements GraphLoader
       }
 
       String nodeId = Util.getNodeName(i);
+      nodeOrder.add(nodeId);
 
       if (!buildMap.containsKey(nodeId)) {
         buildMap.put(nodeId, new HashSet<String>());
@@ -69,7 +73,7 @@ public class RandomGraphLoader implements GraphLoader
 
     GraphSpec spec = new GraphSpec(nodeCnt);
 
-    for (String nodeId : buildMap.keySet()) {
+    for (String nodeId : nodeOrder) {
       spec.addNode(nodeId, buildMap.get(nodeId).toArray(new String[0]));
     }
 

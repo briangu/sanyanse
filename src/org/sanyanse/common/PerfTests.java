@@ -166,8 +166,8 @@ public class PerfTests
       }
 
       String outfileName = String.format("%s_%s_out", "sanyanse", graphName);
-      ColoringResultWriter writer = StdoutResultWriter.create(outfileName, result);
-      writer.write();
+      ColoringResultWriter writer = StdoutResultWriter.create();
+      writer.write(result);
     }
     catch (Exception e)
     {

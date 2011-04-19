@@ -1,6 +1,9 @@
 package org.sanyanse.common;
 
+
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class Util
@@ -32,4 +35,17 @@ public class Util
 
     return name;
   }
+
+ public static String join(Collection<?> s, String delimiter) {
+     StringBuilder builder = new StringBuilder();
+     Iterator iter = s.iterator();
+     while (iter.hasNext()) {
+         builder.append(iter.next().toString());
+         if (!iter.hasNext()) {
+           break;
+         }
+         builder.append(delimiter);
+     }
+     return builder.toString();
+ }
 }
