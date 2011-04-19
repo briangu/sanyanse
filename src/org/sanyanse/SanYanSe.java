@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import org.sanyanse.colorer.BetterBacktrackColorer;
+import org.sanyanse.colorer.FoldingColorer;
 import org.sanyanse.colorer.MultiColorer;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.GraphColorer;
@@ -49,7 +49,7 @@ public class SanYanSe
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
 //    colorers.add(new WaveColorer(graphSpec));
-    colorers.add(new BetterBacktrackColorer(graphSpec));
+    colorers.add(new FoldingColorer(graphSpec));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new SimpleThreadFactory());
     MultiColorer mc = MultiColorer.create(executor, colorers);

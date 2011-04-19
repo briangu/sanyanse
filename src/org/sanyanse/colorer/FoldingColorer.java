@@ -12,17 +12,17 @@ public class FoldingColorer implements GraphColorer
 {
   GraphSpec _spec;
 
+  public FoldingColorer(GraphSpec spec)
+  {
+    _spec = spec;
+  }
+
   private static class FoldableNode
   {
     public SettableInteger Color = new SettableInteger(0);
     public Set<FoldableNode> Edges;
     public String Id;
-    public Set<String> Folded = null;
-    public FoldableNode FoldedInto = null;
-
-    public boolean IsFolded() {
-      return FoldedInto != null;
-    }
+    public Set<FoldableNode> Folded = new HashSet<FoldableNode>();
 
     public FoldableNode(String id) {
       Id = id;
@@ -54,11 +54,7 @@ public class FoldingColorer implements GraphColorer
     }
   }
 
-  public FoldingColorer(GraphSpec spec)
-  {
-    _spec = spec;
-  }
-
+  // TODO: build stat buckets for edge counts to optimize folding sequence
   static Map<String, FoldableNode> buildColoringArray(GraphSpec spec)
   {
     Map<String, FoldableNode> buildMap = new HashMap<String, FoldableNode>(spec.NodeCount);
@@ -131,23 +127,23 @@ public class FoldingColorer implements GraphColorer
 
   private void foldSingleNodes(Map<String, FoldableNode> arr)
   {
+    List<String> oneEdgeNodes = new ArrayList<String>();
+
     for (String nodeId : arr.keySet())
     {
+      if (arr.get(nodeId).Edges.size() > 1) continue;
+      oneEdgeNodes.add(nodeId);
+    }
+
+    for (String nodeId : oneEdgeNodes)
+    {
       FoldableNode node = arr.get(nodeId);
-
-      if (node.FoldedInto != null) continue;
-
-      Set<FoldableNode> edges = arr.get(nodeId).Edges;
-
-      if (edges.size() > 1) continue;
-
+      Set<FoldableNode> edges = node.Edges;
       FoldableNode neighbor = edges.iterator().next();
-
       List<FoldableNode> candidates = getFoldingCandidates(node, neighbor);
-
       if (candidates.size() == 0) continue;
-
       foldNode(node, candidates.get(0));
+      arr.remove(node.Id);
     }
   }
 
@@ -166,20 +162,35 @@ public class FoldingColorer implements GraphColorer
     return nodes;
   }
 
-  private void foldNode(FoldableNode node, FoldableNode neighborNode)
+  private void foldNode(FoldableNode srcNode, FoldableNode destNode)
   {
-    node.FoldedInto = neighborNode;
-    neighborNode.Edges.addAll(node.Edges);
-    neighborNode.Folded.add(node.Id);
+    // take node and merge it with the target
+    destNode.Edges.addAll(srcNode.Edges);
+
+    // keep track of what got merged into this node
+    destNode.Folded.add(srcNode);
+
+    // vist all the srcNode's neighbors and update the link to the node to point to the destNode
+    for (FoldableNode neighborNode : srcNode.Edges)
+    {
+      neighborNode.Edges.remove(srcNode);
+      neighborNode.Edges.add(destNode);
+    }
   }
 
-  private boolean canFoldInto(FoldableNode node, FoldableNode secondDegree)
+  private boolean canFoldInto(FoldableNode srcNode, FoldableNode destNode)
   {
-    if (secondDegree.IsFolded()) return false;
+    // TESTS:
+    // srcNode not connected to destNode
+    if (srcNode.Edges.contains(destNode) || destNode.Edges.contains(srcNode))
+    {
+      return false;
+    }
+
+    // destNode not connected to any other second degree of srcNode
 
 
-
-    return false;  //To change body of created methods use File | Settings | File Templates.
+    return true;
   }
 
   private ColoringResult createResult(Map<String, FoldableNode> map)
