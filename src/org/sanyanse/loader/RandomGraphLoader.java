@@ -1,12 +1,14 @@
 package org.sanyanse.loader;
 
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import org.sanyanse.common.GraphLoader;
 import org.sanyanse.common.GraphSpec;
 import org.sanyanse.common.Util;
-
-import java.sql.Time;
-import java.util.*;
 
 
 public class RandomGraphLoader implements GraphLoader
@@ -41,7 +43,7 @@ public class RandomGraphLoader implements GraphLoader
     Map<String, Set<String>> buildMap = new HashMap<String, Set<String>>();
 
     for (int i = 1; i <= nodeCnt; i++) {
-      int neighborCnt = Math.max(rnd.nextInt(nodeCnt / 2), 1);
+      int neighborCnt = Math.max(rnd.nextInt(Math.min(3, nodeCnt)), 1);
 
       Set<String> neighbors = new HashSet<String>(neighborCnt);
       for (int n = 0; n < neighborCnt; n++) {

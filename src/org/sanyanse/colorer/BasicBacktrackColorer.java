@@ -102,6 +102,33 @@ public class BasicBacktrackColorer implements GraphColorer
     for (int i = 0; i < arr.length; i++)
     {
       long color = arr[i].Node.get();
+
+      if (color == 0) return false;
+
+      SettableInteger[] row = arr[i].Edges;
+
+      // TODO: explore leveraging undirected nature of connection matrix
+
+      for (int x = 0; x < row.length; x++)
+      {
+        if (row[x].get() == color)
+        {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  private boolean isPartial(ColorableNode[] arr)
+  {
+    for (int i = 0; i < arr.length; i++)
+    {
+      long color = arr[i].Node.get();
+
+      if (color == 0) continue;
+
       SettableInteger[] row = arr[i].Edges;
 
       // TODO: explore leveraging undirected nature of connection matrix
@@ -129,7 +156,7 @@ public class BasicBacktrackColorer implements GraphColorer
 
     while ((k >= 0) && !isColored)
     {
-      while (arr[k].Node.get() <= 2)
+      while (arr[k].Node.get() <= 3)
       {
         arr[k].Node.set(arr[k].Node.get() + 1);
 
@@ -139,13 +166,9 @@ public class BasicBacktrackColorer implements GraphColorer
           break;
         }
 
-        if (k < (arr.length - 1))
+        if (isPartial(arr))
         {
           k++;
-        }
-        else
-        {
-          break;
         }
       }
 
