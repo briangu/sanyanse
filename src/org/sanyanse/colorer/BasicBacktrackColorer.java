@@ -146,7 +146,7 @@ public class BasicBacktrackColorer implements GraphColorer
 
     while ((k >= 0) && !isColored)
     {
-      while ((arr[k].Node.get() <= 3))
+      while ((arr[k].Node.get() <= 2))
       {
         arr[k].Node.set(arr[k].Node.get() + 1);
 
@@ -159,13 +159,13 @@ public class BasicBacktrackColorer implements GraphColorer
         if (state == ColorState.PartialValid)
         {
           k++;
-          System.out.println(k);
+//          System.out.println(k);
         }
       }
 
       if (!isColored)
       {
-        System.out.println(k);
+//        System.out.println(k);
         arr[k].Node.set(0);
         k--;
       }

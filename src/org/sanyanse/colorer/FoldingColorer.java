@@ -182,6 +182,11 @@ public class FoldingColorer implements GraphColorer
       }
 
       List<String> specEdges = spec.Edges.get(spec.Nodes.get(i));
+      if (specEdges == null)
+      {
+        throw new IllegalArgumentException(String.format("missing edges for id %s", i));
+      }
+
       Set<FoldableNode> edges = new HashSet<FoldableNode>(specEdges.size());
 
       int length = specEdges.size();
@@ -207,7 +212,14 @@ public class FoldingColorer implements GraphColorer
   @Override
   public ColoringResult call()
   {
-    final Map<String, FoldableNode> arr = buildColoringArray(_spec);
+    final Map<String, FoldableNode> arr;
+
+    try {
+      arr = buildColoringArray(_spec);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
 
     Map<String, FoldableNode> foldedMap = fold(arr);
 

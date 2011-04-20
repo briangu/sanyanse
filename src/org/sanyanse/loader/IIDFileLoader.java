@@ -37,13 +37,18 @@ public class IIDFileLoader implements GraphLoader
           if (!buildMap.containsKey(nodeId)) {
             buildMap.put(nodeId, new ArrayList<String>());
           }
+          if (!buildMap.containsKey(neighborId))
+          {
+            buildMap.put(neighborId, new ArrayList<String>());
+          }
           buildMap.get(nodeId).add(neighborId);
+          buildMap.get(neighborId).add(nodeId);
         } else if (strLine.startsWith("p")) {
           nodeCnt = Integer.parseInt(parts[2]);
         }
       }
       in.close();
-    } catch (Exception e) {//Catch exception if any
+    } catch (Exception e) {
       System.err.println("Error: " + e.getMessage());
     }
 
@@ -51,7 +56,7 @@ public class IIDFileLoader implements GraphLoader
       throw new IllegalArgumentException("file does not contain node count");
     }
 
-    GraphSpec spec = new GraphSpec(nodeCnt);
+    GraphSpec spec = new GraphSpec(buildMap.size());
 
     for (String nodeId : buildMap.keySet()) {
       spec.addNode(nodeId, buildMap.get(nodeId));

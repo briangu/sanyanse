@@ -46,7 +46,7 @@ public class RandomGraphLoader implements GraphLoader
     Map<String, Set<String>> buildMap = new HashMap<String, Set<String>>();
 
     for (int i = 1; i <= nodeCnt; i++) {
-      int neighborCnt = Math.max(rnd.nextInt(Math.min(2, nodeCnt)), 1);
+      int neighborCnt = Math.max(rnd.nextInt(Math.min(3, nodeCnt)), 1);
 
       Set<String> neighbors = new HashSet<String>(neighborCnt);
       for (int n = 0; n < neighborCnt; n++) {
