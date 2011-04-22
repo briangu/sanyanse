@@ -6,17 +6,13 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-
-import org.sanyanse.colorer.BasicBacktrackColorer;
 import org.sanyanse.colorer.FoldingColorer;
 import org.sanyanse.colorer.MultiColorer;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphLoader;
 import org.sanyanse.common.GraphSpec;
-import org.sanyanse.loader.IIDFileLoader;
-import org.sanyanse.loader.PetersenLoader;
-import org.sanyanse.loader.RandomGraphLoader;
+import org.sanyanse.loader.LinkedInFileLoader;
 import org.sanyanse.writer.StdoutGraphSpecWriter;
 import org.sanyanse.writer.StdoutResultWriter;
 
@@ -47,8 +43,13 @@ public class SanYanSe
     //= LinkedInFileLoader.create(args[0]);
 //    loader = new RandomGraphLoader(32, 32, 1.00, 0);
 //    loader = IIDFileLoader.create("/home/brian/src/IID/250/4.00/graph_2835");
-    loader = new PetersenLoader();
+    loader = LinkedInFileLoader.create("/Users/bguarrac/workspace/sanyanse/test/Sample3Colorable.3color");
     GraphSpec graphSpec = loader.load();
+    if (graphSpec == null)
+    {
+      System.out.println("failed to load graph");
+      return;
+    }
 
     System.out.println("graph spec");
     StdoutGraphSpecWriter.create().write(graphSpec);

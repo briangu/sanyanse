@@ -409,6 +409,7 @@ public class FoldingColorer implements GraphColorer
       return false;
     }
 
+/*
     if (srcNode.Edges.size() > 1)
     {
       // destNode not connected to any other second degree of srcNode
@@ -420,6 +421,7 @@ public class FoldingColorer implements GraphColorer
         }
       }
     }
+*/
 
     return true;
   }

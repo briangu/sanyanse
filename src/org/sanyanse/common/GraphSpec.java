@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class GraphSpec
@@ -24,6 +25,10 @@ public class GraphSpec
     this(nodeCnt);
     Nodes = nodes;
     Edges = edges;
+  }
+
+  public void addNode(String id, Set<String> edges) {
+    addNode(id, Arrays.asList(edges.toArray(new String[edges.size()])));
   }
 
   public void addNode(String id, String[] edges) {
