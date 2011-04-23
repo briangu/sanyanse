@@ -45,15 +45,15 @@ public class RandomGraphLoader implements GraphLoader
     List<String> nodeOrder = new ArrayList<String>(nodeCnt);
     Map<String, Set<String>> buildMap = new HashMap<String, Set<String>>();
 
+    double sum = 0.0;
+
     for (int i = 1; i <= nodeCnt; i++)
     {
       String nodeId = Util.getNodeName(i);
 
       nodeOrder.add(nodeId);
 
-      if (!buildMap.containsKey(nodeId)) {
-        buildMap.put(nodeId, new HashSet<String>());
-      }
+      buildMap.put(nodeId, new HashSet<String>());
 
       Set<String> neighbors = new HashSet<String>();
 
@@ -62,15 +62,22 @@ public class RandomGraphLoader implements GraphLoader
         if (j == i) continue;
         double r = rnd.nextDouble();
         if (r > _connectionPercent) continue;
-        neighbors.add(Util.getNodeName(j));
+        String neighborId = Util.getNodeName(j);
+        neighbors.add(neighborId);
       }
 
       buildMap.get(nodeId).addAll(neighbors);
 
-      for (String neighborId : neighbors) {
-        if (!buildMap.containsKey(neighborId)) {
-          buildMap.put(neighborId, new HashSet<String>());
-        }
+      sum += neighbors.size() / (double )nodeCnt;
+    }
+
+    double realP = sum / (double )nodeCnt;
+    System.out.println(String.format("actual distribution = %s", realP));
+
+    for (String nodeId : buildMap.keySet())
+    {
+      for (String neighborId : buildMap.get(nodeId))
+      {
         buildMap.get(neighborId).add(nodeId);
       }
     }

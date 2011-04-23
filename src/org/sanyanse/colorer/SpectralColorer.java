@@ -32,8 +32,8 @@ public class SpectralColorer implements GraphColorer
     throws Exception
   {
     GraphSpec gPrime = computeGPrime(_spec);
-    Matrix adj = computeAdjacencyMatrix(gPrime);
-    computeSpectrum(adj);
+    GraphDecomposition comp = computeAdjacencyMatrix(gPrime);
+    computeSpectrum(comp);
     return null;
   }
 
@@ -52,14 +52,24 @@ public class SpectralColorer implements GraphColorer
     return gPrime;
   }
 
-  private static Matrix computeAdjacencyMatrix(GraphSpec spec)
+  private static class GraphDecomposition
+  {
+    public Matrix Adjacency;
+    public Matrix Degree;
+    public Matrix Laplacian;
+  }
+
+  private static GraphDecomposition computeAdjacencyMatrix(GraphSpec spec)
   {
     Matrix adj = new Matrix(spec.NodeCount, spec.NodeCount);
+    Matrix deg = new Matrix(spec.NodeCount, spec.NodeCount);
 
     for (int i = 0; i < spec.NodeCount; i++)
     {
       String xNodeId = spec.Nodes.get(i);
       Set<String> xEdges = spec.Edges.get(xNodeId);
+
+      deg.set(i, i, xEdges.size());
 
       for (int j = 0; j < spec.NodeCount; j++)
       {
@@ -71,10 +81,17 @@ public class SpectralColorer implements GraphColorer
 
     adj.print(new PrintWriter(System.out,true), 0, 0);
 
-    return adj;
+    GraphDecomposition comp = new GraphDecomposition();
+    comp.Adjacency = adj;
+    comp.Degree = deg;
+    comp.Laplacian = deg.minus(adj);
+
+    return comp;
   }
 
-  public static void computeSpectrum(Matrix adj) {
+  public static void computeSpectrum(GraphDecomposition comp) {
+    Matrix adj = comp.Adjacency;
+
      // create a symmetric positive definite matrix
 //     Matrix A = Matrix.random(N, N);
 //     A = A.transpose().times(A);
@@ -84,17 +101,31 @@ public class SpectralColorer implements GraphColorer
     Matrix V = e.getV();
     Matrix D = e.getD();
 
-    Matrix maxV = V.getMatrix(adj.getColumnDimension()-1, adj.getColumnDimension()-1, 0, adj.getRowDimension()-1);
+//    Matrix maxV = V.getMatrix(0, adj.getRowDimension() - 1, adj.getColumnDimension() - 1, adj.getColumnDimension() - 1);
+//    Matrix maxV2 = V.getMatrix(0, adj.getRowDimension() - 1, adj.getColumnDimension() - 2, adj.getColumnDimension() - 2);
+
+    Matrix maxV = V.getMatrix(0, adj.getRowDimension() - 1, 0, 0);
+    Matrix maxV2 = V.getMatrix(0, adj.getRowDimension() - 1, 1, 1);
+
+    Matrix t = maxV.times(1.0).plus(maxV2.times(3.0));
+
+    int a = 6;
+    int b = 3;
+
+//    maxV.print(a,b);
+//    maxV2.print(a,b);
+    t.print(a, b);
 
 //    System.out.print("A =");
 //    adj.print(9, 6);
 //    System.out.print("D =");
 //    D.print(9, 6);
-    System.out.print("V =");
-    V.print(9, 6);
 
-    Matrix Q = adj.times(maxV.transpose());
-    Q.print(9, 6);
+    System.out.print("V =");
+    V.print(a,b);
+
+    Matrix Q = adj.times(maxV);
+    Q.print(a,b);
 
 /*
      // check that V is orthogonal

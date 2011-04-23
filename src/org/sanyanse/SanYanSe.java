@@ -41,7 +41,7 @@ public class SanYanSe
     String graphName = args.length > 0 ? args[0] : "memory";
 
     //= LinkedInFileLoader.create(args[0]);
-    loader = new RandomGraphLoader(16, 0.35);
+    loader = new RandomGraphLoader(16, 0.70);
 //    loader = IIDFileLoader.create("/home/brian/src/IID/250/4.00/graph_2835");
 //    loader = LinkedInFileLoader.create("/Users/bguarrac/workspace/sanyanse/test/Sample3Colorable.3color");
     GraphSpec graphSpec = loader.load();
