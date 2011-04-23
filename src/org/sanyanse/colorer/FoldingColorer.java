@@ -120,7 +120,7 @@ public class FoldingColorer implements GraphColorer
 
       for (String nodeId : foldedGraph.keySet())
       {
-        List<String> neighborIds = new ArrayList<String>();
+        Set<String> neighborIds = new HashSet<String>();
 
         for (FoldableNode neighbor : foldedGraph.get(nodeId).Edges)
         {
@@ -181,7 +181,7 @@ public class FoldingColorer implements GraphColorer
         buildMap.put(nodeId, node);
       }
 
-      List<String> specEdges = spec.Edges.get(spec.Nodes.get(i));
+      Set<String> specEdges = spec.Edges.get(spec.Nodes.get(i));
       if (specEdges == null)
       {
         throw new IllegalArgumentException(String.format("missing edges for id %s", i));
@@ -189,11 +189,8 @@ public class FoldingColorer implements GraphColorer
 
       Set<FoldableNode> edges = new HashSet<FoldableNode>(specEdges.size());
 
-      int length = specEdges.size();
-      for (int j = 0; j < length; j++)
+      for (String neighborId : specEdges)
       {
-        final String neighborId = specEdges.get(j);
-
         if (!buildMap.containsKey(neighborId))
         {
           FoldableNode newNode = new FoldableNode(neighborId);

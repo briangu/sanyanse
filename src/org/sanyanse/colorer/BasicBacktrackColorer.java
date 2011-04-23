@@ -3,7 +3,6 @@ package org.sanyanse.colorer;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.sanyanse.common.ColoringResult;
@@ -20,6 +19,11 @@ public class BasicBacktrackColorer implements GraphColorer
     public SettableInteger Node = new SettableInteger(0);
     public String Id;
     public SettableInteger[] Edges;
+
+    public ColorableNode(String id)
+    {
+      Id = id;
+    }
   }
 
   private static class SettableInteger
@@ -71,26 +75,25 @@ public class BasicBacktrackColorer implements GraphColorer
       }
       else
       {
-        node = new ColorableNode() {{ Id = nodeId; }};
+        node = new ColorableNode(nodeId);
         arr[k++] = node;
         buildMap.put(nodeId, node);
       }
 
-      List<String> specEdges = spec.Edges.get(spec.Nodes.get(i));
+      Set<String> specEdges = spec.Edges.get(spec.Nodes.get(i));
       SettableInteger[] edges = new SettableInteger[specEdges.size()];
 
-      for (int j = 0; j < edges.length; j++)
+      int j = 0;
+      for (String neighborId : specEdges)
       {
-        final String neighborId = specEdges.get(j);
-
         if (!buildMap.containsKey(neighborId))
         {
-          ColorableNode newNode = new ColorableNode() {{ Id = neighborId; }};
+          ColorableNode newNode = new ColorableNode(neighborId);
           buildMap.put(neighborId, newNode);
           arr[k++] = newNode;
         }
 
-        edges[j] = buildMap.get(neighborId).Node;
+        edges[j++] = buildMap.get(neighborId).Node;
       }
 
       node.Edges = edges;

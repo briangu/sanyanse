@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import org.sanyanse.colorer.FoldingColorer;
 import org.sanyanse.colorer.MultiColorer;
+import org.sanyanse.colorer.SpectralColorer;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphLoader;
 import org.sanyanse.common.GraphSpec;
-import org.sanyanse.loader.LinkedInFileLoader;
+import org.sanyanse.loader.RandomGraphLoader;
 import org.sanyanse.writer.StdoutGraphSpecWriter;
 import org.sanyanse.writer.StdoutResultWriter;
 
@@ -41,9 +41,9 @@ public class SanYanSe
     String graphName = args.length > 0 ? args[0] : "memory";
 
     //= LinkedInFileLoader.create(args[0]);
-//    loader = new RandomGraphLoader(32, 32, 1.00, 0);
+    loader = new RandomGraphLoader(16, 0.35);
 //    loader = IIDFileLoader.create("/home/brian/src/IID/250/4.00/graph_2835");
-    loader = LinkedInFileLoader.create("/Users/bguarrac/workspace/sanyanse/test/Sample3Colorable.3color");
+//    loader = LinkedInFileLoader.create("/Users/bguarrac/workspace/sanyanse/test/Sample3Colorable.3color");
     GraphSpec graphSpec = loader.load();
     if (graphSpec == null)
     {
@@ -57,7 +57,8 @@ public class SanYanSe
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
 //    colorers.add(new BasicBacktrackColorer(graphSpec));
-    colorers.add(new FoldingColorer(graphSpec));
+//    colorers.add(new FoldingColorer(graphSpec));
+    colorers.add(new SpectralColorer(graphSpec, 0.35));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new SimpleThreadFactory());
     MultiColorer mc = MultiColorer.create(executor, colorers);

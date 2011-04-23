@@ -54,7 +54,7 @@ public class BetterBacktrackColorer implements GraphColorer
 
       Map<String, Integer> colorings = node.Colorings;
 
-      List<String> neighbors = _spec.Edges.get(node.Id);
+      Set<String> neighbors = _spec.Edges.get(node.Id);
 
       while (node.Iter.hasNext()) {
 

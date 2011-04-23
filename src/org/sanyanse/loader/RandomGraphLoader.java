@@ -15,13 +15,13 @@ import org.sanyanse.common.Util;
 
 public class RandomGraphLoader implements GraphLoader
 {
-  double _colorablePercentage;
+  double _connectionPercent;
   int _minNodes;
   int _maxNodes;
   long _seed;
 
-  public RandomGraphLoader(int maxNodes, double colorablePercent) {
-    this(maxNodes, 4, colorablePercent, System.currentTimeMillis());
+  public RandomGraphLoader(int maxNodes, double connectionPercent) {
+    this(maxNodes, maxNodes, connectionPercent, System.currentTimeMillis());
   }
 
   public RandomGraphLoader(int maxNodes, int minNodes, double colorablePercent, long seed) {
@@ -31,7 +31,7 @@ public class RandomGraphLoader implements GraphLoader
       throw new IllegalArgumentException(String.format("max nodes must be greater than %s", Integer.toString(_minNodes)));
     }
 
-    _colorablePercentage = colorablePercent;
+    _connectionPercent = colorablePercent;
     _seed = seed;
   }
 
@@ -45,22 +45,26 @@ public class RandomGraphLoader implements GraphLoader
     List<String> nodeOrder = new ArrayList<String>(nodeCnt);
     Map<String, Set<String>> buildMap = new HashMap<String, Set<String>>();
 
-    for (int i = 1; i <= nodeCnt; i++) {
-      int neighborCnt = Math.max(rnd.nextInt(Math.min(3, nodeCnt)), 1);
-
-      Set<String> neighbors = new HashSet<String>(neighborCnt);
-      for (int n = 0; n < neighborCnt; n++) {
-        int neighbor;
-        while((neighbor = Math.max(rnd.nextInt(nodeCnt), 1)) == i) {};
-        neighbors.add(Util.getNodeName(neighbor));
-      }
-
+    for (int i = 1; i <= nodeCnt; i++)
+    {
       String nodeId = Util.getNodeName(i);
+
       nodeOrder.add(nodeId);
 
       if (!buildMap.containsKey(nodeId)) {
         buildMap.put(nodeId, new HashSet<String>());
       }
+
+      Set<String> neighbors = new HashSet<String>();
+
+      for (int j = 1; j <= nodeCnt; j++)
+      {
+        if (j == i) continue;
+        double r = rnd.nextDouble();
+        if (r > _connectionPercent) continue;
+        neighbors.add(Util.getNodeName(j));
+      }
+
       buildMap.get(nodeId).addAll(neighbors);
 
       for (String neighborId : neighbors) {

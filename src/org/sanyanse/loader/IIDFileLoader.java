@@ -1,18 +1,16 @@
 package org.sanyanse.loader;
 
 
-import org.sanyanse.common.GraphLoader;
-import org.sanyanse.common.GraphSpec;
-import org.sanyanse.common.Util;
-
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import org.sanyanse.common.GraphLoader;
+import org.sanyanse.common.GraphSpec;
 
 
 public class IIDFileLoader implements GraphLoader
@@ -22,7 +20,7 @@ public class IIDFileLoader implements GraphLoader
   public GraphSpec load()
   {
     int nodeCnt = -1;
-    Map<String, List<String>> buildMap = new HashMap<String, List<String>>();
+    Map<String, Set<String>> buildMap = new HashMap<String, Set<String>>();
 
     try {
       FileInputStream fstream = new FileInputStream(_filename);
@@ -35,11 +33,11 @@ public class IIDFileLoader implements GraphLoader
           String nodeId = parts[1];
           String neighborId = parts[2];
           if (!buildMap.containsKey(nodeId)) {
-            buildMap.put(nodeId, new ArrayList<String>());
+            buildMap.put(nodeId, new HashSet<String>());
           }
           if (!buildMap.containsKey(neighborId))
           {
-            buildMap.put(neighborId, new ArrayList<String>());
+            buildMap.put(neighborId, new HashSet<String>());
           }
           buildMap.get(nodeId).add(neighborId);
           buildMap.get(neighborId).add(nodeId);
