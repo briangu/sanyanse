@@ -7,5 +7,5 @@ package org.sanyanse.common;
  */
 public interface GraphLoader
 {
-  GraphSpec load();
+  Graph load();
 }

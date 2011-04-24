@@ -1,31 +1,32 @@
 package org.sanyanse.loader;
 
 
+import org.sanyanse.common.Graph;
+import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphLoader;
-import org.sanyanse.common.GraphSpec;
 
 
 public class MemoryLoader implements GraphLoader
 {
   @Override
-  public GraphSpec load()
+  public Graph load()
   {
-    GraphSpec spec = new GraphSpec(5);
+    GraphBuilder builder = new GraphBuilder(5);
 
 /*
-    spec.addNode("A", new String[] {"B", "C"} );
-    spec.addNode("B", new String[] {"A", "C", "D"} );
-    spec.addNode("C", new String[] {"A", "B", "D"} );
-    spec.addNode("D", new String[] {"B", "C"} );
+    builder.addNode("A", new String[] {"B", "C"} );
+    builder.addNode("B", new String[] {"A", "C", "D"} );
+    builder.addNode("C", new String[] {"A", "B", "D"} );
+    builder.addNode("D", new String[] {"B", "C"} );
 */
 
     // not colorable
-    spec.addNode("A", new String[] {"B", "C", "D", "E"});
-    spec.addNode("B", new String[] {"A", "C"});
-    spec.addNode("C", new String[] {"A", "B", "D", "E"});
-    spec.addNode("D", new String[] {"A", "C", "E"});
-    spec.addNode("E", new String[] {"A", "C", "D"});
+    builder.addNode("A", new String[] {"B", "C", "D", "E"});
+    builder.addNode("B", new String[] {"A", "C"});
+    builder.addNode("C", new String[] {"A", "B", "D", "E"});
+    builder.addNode("D", new String[] {"A", "C", "E"});
+    builder.addNode("E", new String[] {"A", "C", "D"});
 
-    return spec;
+    return builder.build();
   }
 }

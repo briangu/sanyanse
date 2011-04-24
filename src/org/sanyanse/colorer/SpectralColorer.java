@@ -3,22 +3,21 @@ package org.sanyanse.colorer;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Set;
+import org.sanyanse.common.ColorableNode;
 import org.sanyanse.common.ColoringResult;
+import org.sanyanse.common.Graph;
+import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphDecomposition;
-import org.sanyanse.common.GraphSpec;
 
 
 public class SpectralColorer implements GraphColorer
 {
-  GraphSpec _spec;
+  Graph _spec;
   double _p;
   double _d;
 
-  public SpectralColorer(GraphSpec spec, double p)
+  public SpectralColorer(Graph spec, double p)
   {
     _spec = spec;
     _p = p;
@@ -29,23 +28,25 @@ public class SpectralColorer implements GraphColorer
   public ColoringResult call()
     throws Exception
   {
-    GraphSpec gPrime = computeGPrime(_spec);
+    Graph gPrime = computeGPrime(_spec);
     GraphDecomposition comp = GraphDecomposition.computeGraphDecomposition(gPrime);
     computeSpectrum(comp);
     return null;
   }
 
-  private GraphSpec computeGPrime(GraphSpec spec)
+  private Graph computeGPrime(Graph graph)
   {
-    GraphSpec gPrime = spec.clone();
+    GraphBuilder builder = GraphBuilder.createFrom(graph);
 
-    for (String nodeId : spec.Nodes)
+    for (ColorableNode node : graph.Nodes)
     {
-      if (spec.Edges.get(nodeId).size() > (5 *_d))
+      if (node.Edges.length > (5 *_d))
       {
-        gPrime.removeNode(nodeId);
+        builder.removeNode(node.Id);
       }
     }
+
+    Graph gPrime = builder.build();
 
     return gPrime;
   }
@@ -63,8 +64,10 @@ public class SpectralColorer implements GraphColorer
 
     Matrix t = maxV.times(1.0).plus(maxV2.times(3.0));
 
-    int a = 6;
+    int a = 5;
     int b = 3;
+
+    comp.getAdjacency().print(0,0);
 
 //    maxV.print(a,b);
 //    maxV2.print(a,b);

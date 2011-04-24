@@ -1,148 +1,28 @@
 package org.sanyanse.colorer;
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import org.sanyanse.common.ColorableNode;
 import org.sanyanse.common.ColoringResult;
+import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphColorer;
-import org.sanyanse.common.GraphSpec;
+
+import static org.sanyanse.common.Graph.ColorState.Complete;
+import static org.sanyanse.common.Graph.ColorState.PartialValid;
 
 
 public class BasicBacktrackColorer implements GraphColorer
 {
-  GraphSpec _spec;
+  Graph _graph;
 
-  private static class ColorableNode
+  public BasicBacktrackColorer(Graph graph)
   {
-    public SettableInteger Node = new SettableInteger(0);
-    public String Id;
-    public SettableInteger[] Edges;
-
-    public ColorableNode(String id)
-    {
-      Id = id;
-    }
-  }
-
-  private static class SettableInteger
-  {
-    Integer _value;
-
-    public SettableInteger(Integer l)
-    {
-      _value = l;
-    }
-
-    public Integer get()
-    {
-      return _value;
-    }
-
-    public void set(Integer value)
-    {
-      _value = value;
-    }
-
-    public boolean equals(Object o)
-    {
-      return ((SettableInteger) o).get() == _value;
-    }
-  }
-
-  public BasicBacktrackColorer(GraphSpec spec)
-  {
-    _spec = spec;
-  }
-
-  static ColorableNode[] buildColoringArray(GraphSpec spec)
-  {
-    ColorableNode[] arr = new ColorableNode[spec.NodeCount];
-
-    Map<String, ColorableNode> buildMap = new HashMap<String, ColorableNode>(arr.length);
-
-    int k = 0;
-
-    for (int i = 0; i < spec.NodeCount; i++)
-    {
-      final String nodeId = spec.Nodes.get(i);
-
-      ColorableNode node;
-
-      if (buildMap.containsKey(nodeId))
-      {
-        node = buildMap.get(nodeId);
-      }
-      else
-      {
-        node = new ColorableNode(nodeId);
-        arr[k++] = node;
-        buildMap.put(nodeId, node);
-      }
-
-      Set<String> specEdges = spec.Edges.get(spec.Nodes.get(i));
-      SettableInteger[] edges = new SettableInteger[specEdges.size()];
-
-      int j = 0;
-      for (String neighborId : specEdges)
-      {
-        if (!buildMap.containsKey(neighborId))
-        {
-          ColorableNode newNode = new ColorableNode(neighborId);
-          buildMap.put(neighborId, newNode);
-          arr[k++] = newNode;
-        }
-
-        edges[j++] = buildMap.get(neighborId).Node;
-      }
-
-      node.Edges = edges;
-    }
-
-    return arr;
-  }
-
-  enum ColorState
-  {
-    Complete,
-    PartialValid,
-    Invalid
-  }
-
-  private ColorState analyzeSolution(ColorableNode[] arr)
-  {
-    ColorState state = BasicBacktrackColorer.ColorState.Complete;
-
-    for (int i = arr.length - 1; i >= 0; i--)
-    {
-      long color = arr[i].Node.get();
-      if (color == 0)
-      {
-        state = BasicBacktrackColorer.ColorState.PartialValid;
-        continue;
-      }
-
-      SettableInteger[] row = arr[i].Edges;
-
-      // TODO: explore leveraging undirected nature of connection matrix
-
-      for (int x = 0; x < row.length; x++)
-      {
-        if (row[x].get() == color)
-        {
-          return BasicBacktrackColorer.ColorState.Invalid;
-        }
-      }
-    }
-
-    return state;
+    _graph = graph;
   }
 
   @Override
   public ColoringResult call()
   {
-    final ColorableNode[] arr = buildColoringArray(_spec);
+    ColorableNode[] arr = _graph.Nodes;
 
     boolean isColored = false;
 
@@ -150,17 +30,17 @@ public class BasicBacktrackColorer implements GraphColorer
 
     while ((k >= 0) && !isColored)
     {
-      while ((arr[k].Node.get() <= 2))
+      while ((arr[k].Color <= 2))
       {
-        arr[k].Node.set(arr[k].Node.get() + 1);
+        arr[k].Color = arr[k].Color + 1;
 
-        ColorState state = analyzeSolution(arr);
-        if (state == ColorState.Complete)
+        Graph.ColorState state = _graph.analyzeState();
+        if (state == Complete)
         {
           isColored = true;
           break;
         }
-        if (state == ColorState.PartialValid)
+        if (state == PartialValid)
         {
           k++;
         }
@@ -168,27 +48,16 @@ public class BasicBacktrackColorer implements GraphColorer
 
       if (!isColored)
       {
-        arr[k].Node.set(0);
+        arr[k].Color = 0;
         k--;
       }
     }
 
     ColoringResult result =
         isColored
-        ? createResult(arr)
+        ? ColoringResult.createColoredGraphResult(_graph)
         : ColoringResult.createNotColorableResult();
 
     return result;
-  }
-
-  private ColoringResult createResult(ColorableNode[] arr)
-  {
-    Map<String, Integer> colorMap = new HashMap<String, Integer>();
-
-    for (ColorableNode node : arr) {
-      colorMap.put(node.Id, node.Node.get());
-    }
-
-    return ColoringResult.create(_spec, colorMap);
   }
 }

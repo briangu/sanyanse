@@ -1,20 +1,10 @@
 package org.sanyanse;
 
 
-import org.sanyanse.colorer.BetterBacktrackColorer;
-import org.sanyanse.colorer.MultiColorer;
-import org.sanyanse.colorer.WaveColorer;
-import org.sanyanse.common.*;
-import org.sanyanse.loader.MemoryLoader;
-import org.sanyanse.writer.StdoutResultWriter;
-
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import org.sanyanse.common.StopWatch;
 
 
 public class PerfTests
@@ -139,43 +129,6 @@ public class PerfTests
     {
       System.out.print(throwable.toString());
     }
-  }
-
-  public static void main(String[] args)
-  {
-    GraphLoader loader;
-
-    String graphName = args.length > 0 ? args[0] : "memory";
-
-    //= LinkedInFileLoader.create(args[0]);
-    loader = new MemoryLoader();
-    GraphSpec graphSpec = loader.load();
-
-    List<GraphColorer> colorers = new ArrayList<GraphColorer>();
-    colorers.add(new WaveColorer(graphSpec));
-    colorers.add(new BetterBacktrackColorer(graphSpec));
-
-    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new SimpleThreadFactory());
-    MultiColorer mc = MultiColorer.create(executor, colorers);
-
-    try
-    {
-      ColoringResult result = mc.call();
-      if (result == null)
-      {
-        result = ColoringResult.createNotColorableResult();
-      }
-
-      String outfileName = String.format("%s_%s_out", "sanyanse", graphName);
-      ColoringResultWriter writer = StdoutResultWriter.create();
-      writer.write(result);
-    }
-    catch (Exception e)
-    {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-    }
-
-    executor.shutdown();
   }
 
   static float[][][] buildArray() {

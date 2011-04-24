@@ -9,9 +9,9 @@ import java.util.concurrent.ThreadFactory;
 import org.sanyanse.colorer.MultiColorer;
 import org.sanyanse.colorer.SpectralColorer;
 import org.sanyanse.common.ColoringResult;
+import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphLoader;
-import org.sanyanse.common.GraphSpec;
 import org.sanyanse.loader.RandomGraphLoader;
 import org.sanyanse.writer.StdoutGraphSpecWriter;
 import org.sanyanse.writer.StdoutResultWriter;
@@ -44,20 +44,20 @@ public class SanYanSe
     loader = new RandomGraphLoader(15, 0.30);
 //    loader = IIDFileLoader.create("/home/brian/src/IID/250/4.00/graph_2835");
 //    loader = LinkedInFileLoader.create("/Users/bguarrac/workspace/sanyanse/test/Sample3Colorable.3color");
-    GraphSpec graphSpec = loader.load();
-    if (graphSpec == null)
+    Graph graph = loader.load();
+    if (graph == null)
     {
       System.out.println("failed to load graph");
       return;
     }
 
     System.out.println("graph spec");
-    StdoutGraphSpecWriter.create().write(graphSpec);
+    StdoutGraphSpecWriter.create().write(graph);
     System.out.println();
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
 //    colorers.add(new BasicBacktrackColorer(graphSpec));
-    colorers.add(new SpectralColorer(graphSpec, 0.35));
+    colorers.add(new SpectralColorer(graph, 0.35));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new SimpleThreadFactory());
     MultiColorer mc = MultiColorer.create(executor, colorers);

@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import org.sanyanse.common.Graph;
+import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphLoader;
-import org.sanyanse.common.GraphSpec;
 import org.sanyanse.common.Util;
 
 
@@ -36,7 +37,7 @@ public class RandomGraphLoader implements GraphLoader
   }
 
   @Override
-  public GraphSpec load()
+  public Graph load()
   {
     Random rnd = new Random(_seed);
 
@@ -71,15 +72,26 @@ public class RandomGraphLoader implements GraphLoader
       sum += neighbors.size() / (double )nodeCnt;
     }
 
+    // ensure we have unidirectional connections
+    for (String nodeId : buildMap.keySet())
+    {
+      for (String neighborId : buildMap.get(nodeId))
+      {
+        buildMap.get(neighborId).add(nodeId);
+      }
+    }
+
     double realP = sum / (double )nodeCnt;
     System.out.println(String.format("actual distribution = %s", realP));
 
-    GraphSpec spec = new GraphSpec(nodeCnt, realP);
+    GraphBuilder builder = new GraphBuilder(nodeCnt, realP);
 
     for (String nodeId : nodeOrder) {
-      spec.addNode(nodeId, buildMap.get(nodeId).toArray(new String[0]));
+      builder.addNode(nodeId, buildMap.get(nodeId));
     }
 
-    return spec;
+    Graph graph = builder.build();
+
+    return graph;
   }
 }

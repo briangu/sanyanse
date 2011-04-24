@@ -1,11 +1,10 @@
 package org.sanyanse.common;
 
+
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class GraphDecomposition
@@ -125,24 +124,27 @@ public class GraphDecomposition
     Matrix maxV2 = V.getMatrix(0, adj.getRowDimension() - 1, 1, 1);
   }
 
-  public static GraphDecomposition computeGraphDecomposition(GraphSpec spec)
+  public static GraphDecomposition computeGraphDecomposition(Graph graph)
   {
-    Matrix adj = new Matrix(spec.NodeCount, spec.NodeCount);
-    Matrix deg = new Matrix(spec.NodeCount, spec.NodeCount);
+    Matrix adj = new Matrix(graph.NodeCount, graph.NodeCount);
+    Matrix deg = new Matrix(graph.NodeCount, graph.NodeCount);
 
-    List<String> nodes = spec.Nodes;
+    ColorableNode[] nodes = graph.Nodes;
+    Map<String, Set<String>> edgeMap = graph.EdgeMap;
 
-    int nodeCnt = spec.NodeCount;
+    int nodeCnt = graph.NodeCount;
 
     for (int i = 0; i < nodeCnt; i++)
     {
-      Set<String> xEdges = spec.Edges.get(nodes.get(i));
+      String nodeId = nodes[i].Id;
 
-      deg.set(i, i, xEdges.size());
+      ColorableNode[] xEdges = nodes[i].Edges;
+
+      deg.set(i, i, xEdges.length);
 
       for (int j = 0; j < nodeCnt; j++)
       {
-        adj.set(i, j, xEdges.contains(nodes.get(j)) ? 1.0 : 0);
+        adj.set(i, j, edgeMap.get(nodeId).contains(nodes[j].Id) ? 1.0 : 0);
       }
     }
 

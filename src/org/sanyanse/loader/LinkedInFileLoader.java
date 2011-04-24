@@ -5,22 +5,20 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import org.sanyanse.common.Graph;
+import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphLoader;
-import org.sanyanse.common.GraphSpec;
 
 
 public class LinkedInFileLoader implements GraphLoader
 {
   private String _filename;
 
-  public GraphSpec load()
+  public Graph load()
   {
     int nodeCnt = -1;
-    Map<String, Set<String>> buildMap = new HashMap<String, Set<String>>();
+
+    GraphBuilder builder = null;
 
     try {
       FileInputStream fstream = new FileInputStream(_filename);
@@ -29,6 +27,8 @@ public class LinkedInFileLoader implements GraphLoader
 
       nodeCnt = Integer.parseInt(br.readLine());
 
+      builder = new GraphBuilder(nodeCnt);
+
       String strLine;
 
       while ((strLine = br.readLine()) != null) {
@@ -36,19 +36,14 @@ public class LinkedInFileLoader implements GraphLoader
         String nodeId = parts[0];
         String neighborIdList = parts[1];
 
+        builder.addNode(nodeId);
+
         for (String neighborId : neighborIdList.split(","))
         {
-          if (!buildMap.containsKey(nodeId)) {
-            buildMap.put(nodeId, new HashSet<String>());
-          }
-          if (!buildMap.containsKey(neighborId))
-          {
-            buildMap.put(neighborId, new HashSet<String>());
-          }
-          buildMap.get(nodeId).add(neighborId);
-          buildMap.get(neighborId).add(nodeId);
+          builder.addEdge(nodeId, neighborId);
         }
       }
+
       in.close();
     } catch (Exception e) {
       System.err.println("Error: " + e.getMessage());
@@ -57,19 +52,13 @@ public class LinkedInFileLoader implements GraphLoader
     if (nodeCnt == -1) {
       throw new IllegalArgumentException("file does not contain node count");
     }
-
-    if (nodeCnt != buildMap.size())
-    {
-      System.out.println(String.format("Warning: nodeCnt != buildMap: %s %s", nodeCnt, buildMap.size()));
+    if (builder == null) {
+      throw new IllegalArgumentException("could not load file");
     }
 
-    GraphSpec spec = new GraphSpec(buildMap.size());
+    Graph graph = builder.build();
 
-    for (String nodeId : buildMap.keySet()) {
-      spec.addNode(nodeId, buildMap.get(nodeId));
-    }
-
-    return spec;
+    return graph;
   }
 
   // file format:
@@ -77,7 +66,6 @@ public class LinkedInFileLoader implements GraphLoader
   // <NODE ID>:<EDGE LIST>
   //
   // EDGE LIST: <NODE ID>,<NODE ID>, ... ,<NODE ID>
-
   public static GraphLoader create(String filename) {
     LinkedInFileLoader loader = new LinkedInFileLoader();
     loader._filename = filename;

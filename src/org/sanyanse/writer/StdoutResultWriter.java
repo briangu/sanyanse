@@ -1,7 +1,7 @@
 package org.sanyanse.writer;
 
 
-import org.sanyanse.common.Coloring;
+import org.sanyanse.common.ColorableNode;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.ColoringResultWriter;
 
@@ -13,8 +13,8 @@ public class StdoutResultWriter implements ColoringResultWriter
     System.out.println(String.format("%s", Boolean.toString(result.IsColored)));
 
     if (result.IsColored) {
-      for (Coloring coloring : result.Colorings) {
-        System.out.println(String.format("%s:%s", coloring.NodeId, coloring.Color));
+      for (ColorableNode node : result.Graph.Nodes) {
+        System.out.println(String.format("%s:%s", node.Id, node.Color));
       }
     }
   }

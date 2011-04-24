@@ -1,28 +1,29 @@
 package org.sanyanse.loader;
 
 
+import org.sanyanse.common.Graph;
+import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphLoader;
-import org.sanyanse.common.GraphSpec;
 
 
 public class PetersenLoader implements GraphLoader
 {
   @Override
-  public GraphSpec load()
+  public Graph load()
   {
-    GraphSpec spec = new GraphSpec(10);
+    GraphBuilder builder = new GraphBuilder(10);
 
-    spec.addNode("A", new String[] {"E", "F", "G"});
-    spec.addNode("B", new String[] {"A", "G", "C"});
-    spec.addNode("C", new String[] {"B", "H", "D"});
-    spec.addNode("D", new String[] {"C", "I", "E"});
-    spec.addNode("E", new String[] {"A", "D", "J"});
-    spec.addNode("F", new String[] {"A", "I", "H"});
-    spec.addNode("G", new String[] {"B", "J", "I"});
-    spec.addNode("H", new String[] {"C", "F", "J"});
-    spec.addNode("I", new String[] {"D", "F", "G"});
-    spec.addNode("J", new String[] {"E", "G", "H"});
+    builder.addNode("A", new String[]{"E", "F", "G"});
+    builder.addNode("B", new String[]{"A", "G", "C"});
+    builder.addNode("C", new String[]{"B", "H", "D"});
+    builder.addNode("D", new String[]{"C", "I", "E"});
+    builder.addNode("E", new String[]{"A", "D", "J"});
+    builder.addNode("F", new String[]{"A", "I", "H"});
+    builder.addNode("G", new String[]{"B", "J", "I"});
+    builder.addNode("H", new String[]{"C", "F", "J"});
+    builder.addNode("I", new String[]{"D", "F", "G"});
+    builder.addNode("J", new String[]{"E", "G", "H"});
 
-    return spec;
+    return builder.build();
   }
 }

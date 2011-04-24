@@ -1,21 +1,19 @@
 package org.sanyanse.writer;
 
 
-import org.sanyanse.common.GraphSpec;
+import java.util.Arrays;
+import org.sanyanse.common.ColorableNode;
+import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphSpecWriter;
 import org.sanyanse.common.Util;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 
 
 public class StdoutGraphSpecWriter implements GraphSpecWriter
 {
   @Override
-  public void write(GraphSpec graphSpec)
+  public void write(Graph graph)
   {
-    System.out.println(String.format("nodeCnt: %s", graphSpec.NodeCount));
+    System.out.println(String.format("nodeCnt: %s", graph.NodeCount));
 
 /*
     Collections.sort(graphSpec.Nodes,
@@ -29,12 +27,12 @@ public class StdoutGraphSpecWriter implements GraphSpecWriter
                       });
 */
 
-    for (String nodeId : graphSpec.Nodes) {
+    for (ColorableNode node : graph.Nodes) {
       System.out.println(
           String.format(
               "%s:%s",
-              nodeId,
-              Util.join(graphSpec.Edges.get(nodeId), ",")));
+              node.Id,
+              Util.join(Arrays.asList(node.Edges), ",")));
     }
   }
 
