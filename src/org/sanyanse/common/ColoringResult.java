@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class ColoringResult
 {
-  public boolean IsColored;
+  public final boolean IsColored;
   public List<Coloring> Colorings;
 
   private ColoringResult(boolean isColored) {

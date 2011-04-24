@@ -41,7 +41,7 @@ public class SanYanSe
     String graphName = args.length > 0 ? args[0] : "memory";
 
     //= LinkedInFileLoader.create(args[0]);
-    loader = new RandomGraphLoader(16, 0.70);
+    loader = new RandomGraphLoader(15, 0.30);
 //    loader = IIDFileLoader.create("/home/brian/src/IID/250/4.00/graph_2835");
 //    loader = LinkedInFileLoader.create("/Users/bguarrac/workspace/sanyanse/test/Sample3Colorable.3color");
     GraphSpec graphSpec = loader.load();
@@ -57,7 +57,6 @@ public class SanYanSe
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
 //    colorers.add(new BasicBacktrackColorer(graphSpec));
-//    colorers.add(new FoldingColorer(graphSpec));
     colorers.add(new SpectralColorer(graphSpec, 0.35));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new SimpleThreadFactory());

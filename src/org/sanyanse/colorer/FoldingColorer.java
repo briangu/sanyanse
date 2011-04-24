@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import org.sanyanse.common.ColoringResult;
-import org.sanyanse.common.GraphColorer;
-import org.sanyanse.common.GraphSpec;
-import org.sanyanse.common.Util;
+
+import org.sanyanse.common.*;
 
 
 public class FoldingColorer implements GraphColorer
@@ -237,7 +235,7 @@ public class FoldingColorer implements GraphColorer
     if (result != null && result.IsColored)
     {
       // translate solved graph into our mapped graph
-      for (ColoringResult.Coloring coloring : result.Colorings)
+      for (Coloring coloring : result.Colorings)
       {
         foldedMap.get(coloring.NodeId).Color.set(coloring.Color);
       }
