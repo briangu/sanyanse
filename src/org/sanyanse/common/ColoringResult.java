@@ -32,9 +32,4 @@ public class ColoringResult
     }
     return new ColoringResult(colorings);
   }
-
-  public static class Coloring {
-    public String NodeId;
-    public int Color;
-  }
 }

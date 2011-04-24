@@ -1,9 +1,10 @@
-package org.sanyanse.common;
+package org.sanyanse;
 
 
 import org.sanyanse.colorer.BetterBacktrackColorer;
 import org.sanyanse.colorer.MultiColorer;
 import org.sanyanse.colorer.WaveColorer;
+import org.sanyanse.common.*;
 import org.sanyanse.loader.MemoryLoader;
 import org.sanyanse.writer.StdoutResultWriter;
 

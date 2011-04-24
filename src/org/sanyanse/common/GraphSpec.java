@@ -15,17 +15,33 @@ public class GraphSpec
   public int NodeCount;
   public List<String> Nodes;
   public Map<String, Set<String>> Edges;
+  public double EdgeProbability;
 
   public GraphSpec(int nodeCnt) {
-    NodeCount = nodeCnt;
-    Nodes = new ArrayList<String>();
-    Edges = new HashMap<String, Set<String>>();
+    this(nodeCnt, new ArrayList<String>(), new HashMap<String, Set<String>>(), -1.0);
   }
 
-  public GraphSpec(int nodeCnt, List<String> nodes, Map<String, Set<String>> edges) {
-    this(nodeCnt);
+  public GraphSpec(int nodeCnt, double  p) {
+    this(nodeCnt, new ArrayList<String>(), new HashMap<String, Set<String>>(), p);
+  }
+
+  public GraphSpec(int nodeCnt, List<String> nodes, Map<String, Set<String>> edges, double p) {
+    NodeCount = nodeCnt;
     Nodes = nodes;
     Edges = edges;
+    EdgeProbability = p;
+  }
+
+  public GraphSpec clone()
+  {
+    GraphSpec copy = new GraphSpec(NodeCount, EdgeProbability);
+
+    for (String nodeId : Nodes)
+    {
+      copy.addNode(nodeId, new HashSet<String>(Edges.get(nodeId)));
+    }
+
+    return copy;
   }
 
   public void addNode(String id, String[] edges) {
@@ -35,18 +51,15 @@ public class GraphSpec
   public void addNode(String id, Set<String> edges) {
     Nodes.add(id);
     Edges.put(id, edges);
-  }
 
-  public GraphSpec clone()
-  {
-    GraphSpec copy = new GraphSpec(NodeCount);
-
-    for (String nodeId : Nodes)
+    for (String neighborId : edges)
     {
-      copy.addNode(nodeId, new HashSet<String>(Edges.get(nodeId)));
+      if (!Edges.containsKey(neighborId))
+      {
+        Edges.put(neighborId, new HashSet<String>());
+      }
+      Edges.get(neighborId).add(id);
     }
-
-    return copy;
   }
 
   public void removeNode(String nodeId)

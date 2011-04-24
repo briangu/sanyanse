@@ -74,15 +74,7 @@ public class RandomGraphLoader implements GraphLoader
     double realP = sum / (double )nodeCnt;
     System.out.println(String.format("actual distribution = %s", realP));
 
-    for (String nodeId : buildMap.keySet())
-    {
-      for (String neighborId : buildMap.get(nodeId))
-      {
-        buildMap.get(neighborId).add(nodeId);
-      }
-    }
-
-    GraphSpec spec = new GraphSpec(nodeCnt);
+    GraphSpec spec = new GraphSpec(nodeCnt, realP);
 
     for (String nodeId : nodeOrder) {
       spec.addNode(nodeId, buildMap.get(nodeId).toArray(new String[0]));
