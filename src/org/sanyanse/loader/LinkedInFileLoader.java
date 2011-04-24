@@ -33,6 +33,8 @@ public class LinkedInFileLoader implements GraphLoader
 
       while ((strLine = br.readLine()) != null) {
         String[] parts = strLine.split(":");
+        if (parts.length <= 1) break;
+
         String nodeId = parts[0];
         String neighborIdList = parts[1];
 
