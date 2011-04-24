@@ -1,6 +1,7 @@
 package org.sanyanse.common;
 
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,12 +40,14 @@ public class Graph
     public int CorrectNodeColorings;
     public int CorrectEdgeColorings;
     public ColorState State;
+    public Map<String, Integer> EdgeColoringsMap;
 
-    public GraphAnalysis(ColorState state, int correctEdgeColorings, int correctNodeColorings)
+    public GraphAnalysis(ColorState state, int correctEdgeColorings, int correctNodeColorings, Map<String, Integer> edgeColoringsMap)
     {
       State = state;
       CorrectEdgeColorings = correctEdgeColorings;
       CorrectNodeColorings = correctNodeColorings;
+      EdgeColoringsMap = edgeColoringsMap;
     }
 
     public Boolean IsColored()
@@ -94,6 +97,7 @@ public class Graph
     int correctRowColorings = 0;
     int correctEdgeColorings = 0;
     boolean hasInvalidColorings = false;
+    Map<String, Integer> edgeColroingsMap = new HashMap<String, Integer>();
 
     ColorState state = ColorState.Complete;
 
@@ -111,6 +115,8 @@ public class Graph
       // TODO: explore leveraging undirected nature of connection matrix
 
       boolean rowIsCorrectlyColored = true;
+      int nodeEdgeColoringCount = 0;
+
       for (int x = 0; x < row.length; x++)
       {
         if (row[x].Color == color)
@@ -121,8 +127,12 @@ public class Graph
         else
         {
           correctEdgeColorings++;
+          nodeEdgeColoringCount++;
         }
       }
+
+      edgeColroingsMap.put(Nodes[i].Id, nodeEdgeColoringCount);
+
       if (rowIsCorrectlyColored)
       {
         correctRowColorings++;
@@ -134,6 +144,6 @@ public class Graph
       state = Graph.ColorState.Invalid;
     }
 
-    return new GraphAnalysis(state, correctEdgeColorings, correctRowColorings);
+    return new GraphAnalysis(state, correctEdgeColorings, correctRowColorings, edgeColroingsMap);
   }
 }

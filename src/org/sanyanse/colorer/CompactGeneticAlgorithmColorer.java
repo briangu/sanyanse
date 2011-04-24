@@ -28,13 +28,13 @@ public class CompactGeneticAlgorithmColorer implements GraphColorer
 
       switch (color)
       {
-        case 0:
+        case 1:
           Colors = new double[]{0.5, 0.25, 0.25};
           break;
-        case 1:
+        case 2:
           Colors = new double[]{0.25, 0.5, 0.25};
           break;
-        case 2:
+        case 3:
           Colors = new double[]{0.25, 0.25, 0.5};
           break;
       }
@@ -48,72 +48,93 @@ public class CompactGeneticAlgorithmColorer implements GraphColorer
 
     int chooseColor(double r)
     {
-      if (r <= Colors[0]) return 0;
-      if (r >= (1.0 - Colors[2])) return 2;
-      return 1;
+      if (r <= Colors[0]) return 1;
+      if (r >= (1.0 - Colors[2])) return 3;
+      return 2;
     }
 
     void boostColor(int color)
     {
-      if (Colors[color] == 1.0) return;
+      color -= 1;
+
+      if (Colors[color] >= 1.0) return;
 
       double a = ((Colors[color] + _adjFactor) > 1.0) ? (1.0 - Colors[color]) : _adjFactor;
 
+      double spill;
       switch (color)
       {
         case 0:
           Colors[0] += a;
-          Colors[1] -= a / 2;
-          Colors[2] -= a / 2;
+          spill = surpressWithSpill(1, a);
+          boostWithSpill(2, spill);
           break;
         case 1:
           Colors[1] += a;
-          Colors[0] -= a / 2;
-          Colors[2] -= a / 2;
+          spill = surpressWithSpill(0, a);
+          boostWithSpill(2, spill);
           break;
         case 2:
+          spill = surpressWithSpill(0, a);
+          boostWithSpill(1, spill);
           Colors[2] += a;
-          Colors[1] -= a / 2;
-          Colors[2] -= a / 2;
           break;
       }
+    }
 
-      double sum = Colors[0] + Colors[1] + Colors[2];
-      if (sum != 1.0)
-      {
-        Colors[color] = 1.0 - sum;
+    double surpressWithSpill(int color, double adj)
+    {
+      if (adj <= 0) return 0;
+      if (Colors[color] <= 0.0) return adj;
+      if (Colors[color] - adj <= 0.0) {
+        double spill = (0.0 - (Colors[color] - adj));
+        Colors[color] = 0.0;
+        return spill;
       }
+      Colors[color] -= adj;
+      return 0;
+    }
+
+    double boostWithSpill(int color, double adj)
+    {
+      if (adj <= 0) return 0;
+      if (Colors[color] >= 1.0) return adj;
+      if (Colors[color] + adj > 1.0) {
+        double spill = ((Colors[color] + adj) - 1.0);
+        Colors[color] = 1.0;
+        return spill;
+      }
+      Colors[color] += adj;
+      return 0;
     }
 
     void suppressColor(int color)
     {
-      if (Colors[color] == 0.0) return;
+      color -= 1;
+
+      if (Colors[color] <= 0.0) return;
 
       double a = ((Colors[color] - _adjFactor) < 0) ? Colors[color] : _adjFactor;
+
+      double spill;
 
       switch (color)
       {
         case 0:
           Colors[0] -= a;
-          Colors[1] += a / 2;
-          Colors[2] += a / 2;
+          spill = boostWithSpill(1, a);
+          boostWithSpill(2, spill);
           break;
         case 1:
           Colors[1] -= a;
-          Colors[0] += a / 2;
-          Colors[2] += a / 2;
+          spill = boostWithSpill(0, a);
+          boostWithSpill(2, spill);
           break;
         case 2:
+          spill = boostWithSpill(0, a);
+          boostWithSpill(1, spill);
           Colors[2] -= a;
-          Colors[1] += a / 2;
-          Colors[2] += a / 2;
           break;
-      }
-
-      double sum = Colors[0] + Colors[1] + Colors[2];
-      if (sum != 1.0)
-      {
-        Colors[color] = 1.0 - sum;
       }
     }
   }
@@ -136,6 +157,7 @@ public class CompactGeneticAlgorithmColorer implements GraphColorer
   {
     int bestCnt = 0;
     Graph bestGraph = null;
+    Graph.GraphAnalysis bestGraphAnalysis = null;
 
     Graph candidateA = colorGraph(_spec.clone());
     Graph candidateB = colorGraph(_spec.clone());
@@ -163,14 +185,20 @@ public class CompactGeneticAlgorithmColorer implements GraphColorer
       {
         if (analysisA.CorrectEdgeColorings > bestCnt)
         {
+          bestCnt = analysisA.CorrectEdgeColorings;
           bestGraph = candidateA.clone();
+          bestGraphAnalysis = analysisA;
         }
 
         for (int i = 0; i < candidateA.NodeCount; i++)
         {
           int colorA = candidateA.Nodes[i].Color;
-          int colorB = candidateB.Nodes[i].Color;
-          if (colorA != colorB)
+          String nodeId = candidateA.Nodes[i].Id;
+          if (analysisA.EdgeColoringsMap.get(nodeId) < bestGraphAnalysis.EdgeColoringsMap.get(nodeId))
+          {
+            _genes[i].suppressColor(colorA);
+          }
+          else
           {
             _genes[i].boostColor(colorA);
           }
@@ -180,14 +208,20 @@ public class CompactGeneticAlgorithmColorer implements GraphColorer
       {
         if (analysisB.CorrectEdgeColorings > bestCnt)
         {
+          bestCnt = analysisB.CorrectEdgeColorings;
           bestGraph = candidateB.clone();
+          bestGraphAnalysis = analysisB;
         }
 
         for (int i = 0; i < candidateA.NodeCount; i++)
         {
-          int colorA = candidateA.Nodes[i].Color;
           int colorB = candidateB.Nodes[i].Color;
-          if (colorA != colorB)
+          String nodeId = candidateB.Nodes[i].Id;
+          if (analysisB.EdgeColoringsMap.get(nodeId) < bestGraphAnalysis.EdgeColoringsMap.get(nodeId))
+          {
+            _genes[i].suppressColor(colorB);
+          }
+          else
           {
             _genes[i].boostColor(colorB);
           }
@@ -225,7 +259,7 @@ public class CompactGeneticAlgorithmColorer implements GraphColorer
 
     for (int i = 0; i < graph.NodeCount; i++)
     {
-      colorings[i] = r.nextInt(3);
+      colorings[i] = r.nextInt(3) + 1;
     }
 
     return CompactGeneticAlgorithmColorer.create(graph, colorings, adjFactor);
