@@ -67,6 +67,7 @@ public class BasicBacktrackColorer implements GraphColorer
     for (int i = 0; i < spec.NodeCount; i++)
     {
       final String nodeId = spec.Nodes.get(i);
+
       ColorableNode node;
 
       if (buildMap.containsKey(nodeId))
@@ -162,13 +163,11 @@ public class BasicBacktrackColorer implements GraphColorer
         if (state == ColorState.PartialValid)
         {
           k++;
-//          System.out.println(k);
         }
       }
 
       if (!isColored)
       {
-//        System.out.println(k);
         arr[k].Node.set(0);
         k--;
       }
@@ -180,20 +179,6 @@ public class BasicBacktrackColorer implements GraphColorer
         : ColoringResult.createNotColorableResult();
 
     return result;
-  }
-
-  Set<Integer> _colors = new HashSet<Integer>() {{ add(1); add(2); add(3); }};
-
-  private Set<Integer> getViableColors(SettableInteger[] edges)
-  {
-    Set<Integer> colors = new HashSet<Integer>(_colors);
-
-    for (SettableInteger si : edges)
-    {
-      colors.remove(si.get());
-    }
-
-    return colors;
   }
 
   private ColoringResult createResult(ColorableNode[] arr)

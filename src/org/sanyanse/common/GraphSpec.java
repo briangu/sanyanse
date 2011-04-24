@@ -12,10 +12,10 @@ import java.util.Set;
 
 public class GraphSpec
 {
-  public int NodeCount;
-  public List<String> Nodes;
-  public Map<String, Set<String>> Edges;
-  public double EdgeProbability;
+  public final int NodeCount;
+  public final List<String> Nodes;
+  public final Map<String, Set<String>> Edges;
+  public final double EdgeProbability;
 
   public GraphSpec(int nodeCnt) {
     this(nodeCnt, new ArrayList<String>(), new HashMap<String, Set<String>>(), -1.0);
