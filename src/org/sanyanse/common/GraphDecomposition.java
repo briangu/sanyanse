@@ -1,21 +1,20 @@
 package org.sanyanse.common;
 
 
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
-
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.jblas.Eigen;
+import org.jblas.FloatMatrix;
+
 
 public class GraphDecomposition
 {
-  private Matrix _adjacency;
-  private Matrix _degree;
-  private volatile Matrix _laplacian = null;
-  private volatile EigenvalueDecomposition _adjSpectrum = null;
-  private volatile EigenvalueDecomposition _lapSpectrum = null;
+  private FloatMatrix _adjacency;
+  private FloatMatrix _degree;
+  private volatile FloatMatrix _laplacian = null;
+  private volatile FloatMatrix[] _adjSpectrum = null;
+  private volatile FloatMatrix[] _lapSpectrum = null;
 
   private ReentrantReadWriteLock _rwlLaplacian = new ReentrantReadWriteLock();
   private ReentrantReadWriteLock _rwlAdjSpectrum = new ReentrantReadWriteLock();
@@ -23,11 +22,11 @@ public class GraphDecomposition
 
   private int _length;
 
-  public GraphDecomposition(Matrix adj, Matrix deg)
+  public GraphDecomposition(FloatMatrix adj, FloatMatrix deg)
   {
     _adjacency = adj;
     _degree = deg;
-    _length = _adjacency.getColumnDimension();
+    _length = _adjacency.columns;
   }
 
   public int getLength()
@@ -40,33 +39,33 @@ public class GraphDecomposition
     return _length;
   }
 
-  public Matrix getAdjacency()
+  public FloatMatrix getAdjacency()
   {
     return _adjacency;
   }
 
-  public Matrix getDegree()
+  public FloatMatrix getDegree()
   {
     return _degree;
   }
 
-  public Map<String, Double> getCentrality(Graph graph)
+  public Map<String, Float> getCentrality(Graph graph)
   {
-    Map<String, Double> metric = new HashMap<String, Double>(graph.NodeCount);
-    EigenvalueDecomposition e = getAdjacencySpectrum();
-    Matrix V = e.getV();
+    Map<String, Float> metric = new HashMap<String, Float>(graph.NodeCount);
+    FloatMatrix[] e = getAdjacencySpectrum();
+    FloatMatrix eigenvectors = e[0];
 
     for (int i = 0; i < _length; i++)
     {
-      metric.put(graph.Nodes[i].Id, V.get(i, _length - 1));
+      metric.put(graph.Nodes[i].Id, eigenvectors.get(i, _length - 1));
     }
 
     return metric;
   }
 
-  public Matrix getLaplacian()
+  public FloatMatrix getLaplacian()
   {
-    Matrix result;
+    FloatMatrix result;
 
     _rwlLaplacian.readLock().lock();
 
@@ -77,7 +76,7 @@ public class GraphDecomposition
 
       if (_laplacian == null)
       {
-        _laplacian = _degree.minus(_adjacency);
+        _laplacian = _degree.sub(_adjacency);
       }
 
       _rwlLaplacian.readLock().lock();
@@ -91,9 +90,9 @@ public class GraphDecomposition
     return result;
   }
 
-  public EigenvalueDecomposition getAdjacencySpectrum()
+  public FloatMatrix[] getAdjacencySpectrum()
   {
-    EigenvalueDecomposition result;
+    FloatMatrix[] result;
 
     _rwlAdjSpectrum.readLock().lock();
 
@@ -104,7 +103,7 @@ public class GraphDecomposition
 
       if (_adjSpectrum == null)
       {
-        _adjSpectrum = _adjacency.eig();
+        _adjSpectrum = Eigen.symmetricEigenvectors(_adjacency);
       }
 
       _rwlAdjSpectrum.readLock().lock();
@@ -118,9 +117,9 @@ public class GraphDecomposition
     return result;
   }
 
-  public EigenvalueDecomposition getLaplacianSpectrum()
+  public FloatMatrix[] getLaplacianSpectrum()
   {
-    EigenvalueDecomposition result;
+    FloatMatrix[] result;
 
     _rwlLapSpectrum.readLock().lock();
 
@@ -131,7 +130,7 @@ public class GraphDecomposition
 
       if (_lapSpectrum == null)
       {
-        _lapSpectrum = getLaplacian().eig();
+        _lapSpectrum = Eigen.symmetricEigenvectors(getLaplacian());
       }
 
       _rwlLapSpectrum.readLock().lock();
@@ -143,34 +142,5 @@ public class GraphDecomposition
     _rwlLapSpectrum.readLock().unlock();
 
     return result;
-  }
-
-  private static GraphDecomposition computeGraphDecomposition(Graph graph)
-  {
-    Matrix adj = new Matrix(graph.NodeCount, graph.NodeCount);
-    Matrix deg = new Matrix(graph.NodeCount, graph.NodeCount);
-
-    ColorableNode[] nodes = graph.Nodes;
-    Map<String, Set<ColorableNode>> edgeMap = graph.EdgeMap;
-
-    int nodeCnt = graph.NodeCount;
-
-    for (int i = 0; i < nodeCnt; i++)
-    {
-      String nodeId = nodes[i].Id;
-
-      ColorableNode[] xEdges = nodes[i].Edges;
-
-      deg.set(i, i, xEdges.length);
-
-      for (int j = 0; j < nodeCnt; j++)
-      {
-        adj.set(i, j, edgeMap.get(nodeId).contains(nodes[j].Id) ? 1.0 : 0);
-      }
-    }
-
-    GraphDecomposition comp = new GraphDecomposition(adj, deg);
-
-    return comp;
   }
 }

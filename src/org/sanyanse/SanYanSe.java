@@ -14,8 +14,6 @@ import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphLoader;
 import org.sanyanse.common.StopWatch;
 import org.sanyanse.loader.LinkedInFileLoader;
-import org.sanyanse.writer.StdoutGraphSpecWriter;
-import org.sanyanse.writer.StdoutResultWriter;
 
 
 public class SanYanSe
@@ -64,7 +62,7 @@ public class SanYanSe
   private static void processGraph(Graph graph, String graphName)
   {
     System.out.println("graph spec");
-    StdoutGraphSpecWriter.create().write(graph);
+//    StdoutGraphSpecWriter.create().write(graph);
     System.out.println();
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
@@ -92,7 +90,7 @@ public class SanYanSe
       System.out.println();
 
       String outfileName = String.format("%s_%s_out", "sanyanse", graphName);
-      StdoutResultWriter.create().write(result);
+//      StdoutResultWriter.create().write(result);
     }
     catch (Exception e)
     {

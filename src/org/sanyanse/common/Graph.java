@@ -29,7 +29,7 @@ public class Graph
     Decomposition = decomposition;
   }
 
-  public void SortByMetric(final Map<String, Double> metric)
+  public void SortByMetric(final Map<String, Float> metric)
   {
     Arrays.sort(Nodes, new Comparator<ColorableNode>()
     {
