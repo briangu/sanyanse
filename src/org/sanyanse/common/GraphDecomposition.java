@@ -54,10 +54,11 @@ public class GraphDecomposition
     Map<String, Float> metric = new HashMap<String, Float>(graph.NodeCount);
     FloatMatrix[] e = getAdjacencySpectrum();
     FloatMatrix eigenvectors = e[0];
+    int j = eigenvectors.getColumns()-1;
 
     for (int i = 0; i < _length; i++)
     {
-      metric.put(graph.Nodes[i].Id, eigenvectors.get(i, _length - 1));
+      metric.put(graph.Nodes[i].Id, eigenvectors.get(i, j));
     }
 
     return metric;

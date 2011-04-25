@@ -1,6 +1,7 @@
 package org.sanyanse;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -14,10 +15,20 @@ import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphLoader;
 import org.sanyanse.common.StopWatch;
 import org.sanyanse.loader.LinkedInFileLoader;
+import org.sanyanse.writer.FileResultWriter;
+import org.sanyanse.writer.StdoutGraphSpecWriter;
 
 
+/**
+ * SanYanSe: 3 Coloring Graph coloring framework
+ *
+ * Brian Guarraci
+ *
+ */
 public class SanYanSe
 {
+  static Boolean _debug = false;
+
   static class SimpleThreadFactory implements ThreadFactory, Thread.UncaughtExceptionHandler
   {
     public Thread newThread(Runnable r) {
@@ -35,15 +46,17 @@ public class SanYanSe
 
   public static void main(String[] args)
   {
-    GraphLoader loader;
+    if (args.length == 0)
+    {
+      System.out.println("usage: sanyanse <graph filename>");
+      return;
+    }
 
-    String graphName = args.length > 0 ? args[0] : "memory";
+    String readFile = args[args.length - 1];
+    String graphName = new File(readFile).getName();
 
-    //= LinkedInFileLoader.create(args[0]);
-//    loader = new RandomGraphLoader(2048, 0.30);
-//    loader = IIDFileLoader.create("/home/brian/src/IID/250/4.00/graph_2835");
-    loader = LinkedInFileLoader.create("/Users/bguarrac/workspace/sanyanse/test/out.col");
-//    loader = new PetersenLoader();
+    GraphLoader loader = LinkedInFileLoader.create(readFile);
+//    loader = new RandomGraphLoader(8, 0.30);
     Graph graph = loader.load();
     if (graph == null)
     {
@@ -51,31 +64,33 @@ public class SanYanSe
       return;
     }
 
-//    GraphSpecWriter writer = FileGraphWriter.create("/Users/bguarrac/workspace/sanyanse/test/out.col");
-//    writer.write(graph);
-
-//    processGraph(graph, graphName);
     graph.SortByMetric(graph.Decomposition.getCentrality(graph));
     processGraph(graph, graphName);
   }
 
   private static void processGraph(Graph graph, String graphName)
   {
-    System.out.println("graph spec");
-//    StdoutGraphSpecWriter.create().write(graph);
-    System.out.println();
+    if (_debug)
+    {
+      System.out.println("graph spec");
+      StdoutGraphSpecWriter.create().write(graph);
+      System.out.println();
+    }
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
     colorers.add(new BasicBacktrackColorer(graph));
-//    colorers.add(CompactGeneticAlgorithmColorer.create(graph, 0.05));
-//    colorers.add(new SpectralColorer(graph, 0.35));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
                                                             new SimpleThreadFactory());
     MultiColorer mc = MultiColorer.create(executor, colorers);
 
-    StopWatch stopWatch = new StopWatch();
-    stopWatch.start();
+    StopWatch stopWatch = null;
+
+    if (_debug)
+    {
+      stopWatch = new StopWatch();
+      stopWatch.start();
+    }
 
     try
     {
@@ -85,12 +100,15 @@ public class SanYanSe
         result = ColoringResult.createNotColorableResult();
       }
 
-      stopWatch.stop();
-      System.out.println(String.format("elapsed time: %s", stopWatch.getDuration()));
-      System.out.println();
+      if (_debug)
+      {
+        stopWatch.stop();
+        System.out.println(String.format("elapsed time: %s", stopWatch.getDuration()));
+        System.out.println();
+      }
 
       String outfileName = String.format("%s_%s_out", "sanyanse", graphName);
-//      StdoutResultWriter.create().write(result);
+      FileResultWriter.create(outfileName).write(result);
     }
     catch (Exception e)
     {
