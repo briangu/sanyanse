@@ -43,33 +43,50 @@ public class RandomGraphLoader implements GraphLoader
 
     int nodeCnt = Math.max(rnd.nextInt(_maxNodes), _minNodes);
 
+    int bucketSize = (int)(nodeCnt / 3);
+
     List<String> nodeOrder = new ArrayList<String>(nodeCnt);
     Map<String, Set<String>> buildMap = new HashMap<String, Set<String>>();
 
-    double sum = 0.0;
+    List<Set<String>> buckets = new ArrayList<Set<String>>(3);
+    buckets.add(new HashSet<String>(bucketSize));
+    buckets.add(new HashSet<String>(bucketSize));
+    buckets.add(new HashSet<String>(bucketSize));
+
+    Random r = new Random();
 
     for (int i = 1; i <= nodeCnt; i++)
     {
       String nodeId = Util.getNodeName(i);
-
-      nodeOrder.add(nodeId);
-
+      int b = r.nextInt(3);
+      buckets.get(b).add(nodeId);
       buildMap.put(nodeId, new HashSet<String>());
+    }
 
-      Set<String> neighbors = new HashSet<String>();
+    double sum = 0.0;
 
-      for (int j = 1; j <= nodeCnt; j++)
+    for (Set<String> bucket : buckets)
+    {
+      for (String nodeId : bucket)
       {
-        if (j == i) continue;
-        double r = rnd.nextDouble();
-        if (r > _connectionPercent) continue;
-        String neighborId = Util.getNodeName(j);
-        neighbors.add(neighborId);
+        nodeOrder.add(nodeId);
+
+        Set<String> neighbors = buildMap.get(nodeId);
+
+        for (int j = 1; j <= nodeCnt; j++)
+        {
+          String neighborId = Util.getNodeName(j);
+          if (neighborId.equals(nodeId)) continue;
+          if (bucket.contains(neighborId)) continue;
+          double rx = rnd.nextDouble();
+          if (rx > _connectionPercent) continue;
+          neighbors.add(neighborId);
+        }
+
+        neighbors.addAll(neighbors);
+
+        sum += neighbors.size() / (double )nodeCnt;
       }
-
-      buildMap.get(nodeId).addAll(neighbors);
-
-      sum += neighbors.size() / (double )nodeCnt;
     }
 
     // ensure we have unidirectional connections
