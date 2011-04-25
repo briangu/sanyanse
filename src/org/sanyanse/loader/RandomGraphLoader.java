@@ -1,13 +1,9 @@
 package org.sanyanse.loader;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.lang.reflect.Array;
+import java.util.*;
+
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphLoader;
@@ -53,7 +49,7 @@ public class RandomGraphLoader implements GraphLoader
     buckets.add(new HashSet<String>(bucketSize));
     buckets.add(new HashSet<String>(bucketSize));
 
-    Random r = new Random();
+    final Random r = new Random();
 
     for (int i = 1; i <= nodeCnt; i++)
     {
@@ -100,6 +96,15 @@ public class RandomGraphLoader implements GraphLoader
 
     double realP = sum / (double )nodeCnt;
     System.out.println(String.format("actual distribution = %s", realP));
+
+    Collections.sort(nodeOrder, new Comparator<String>()
+    {
+      @Override
+      public int compare(String o, String o1)
+      {
+        return (new Double(0.5).compareTo(r.nextDouble()));
+      }
+    });
 
     GraphBuilder builder = new GraphBuilder(nodeCnt, realP);
 

@@ -41,7 +41,7 @@ public class SanYanSe
     String graphName = args.length > 0 ? args[0] : "memory";
 
     //= LinkedInFileLoader.create(args[0]);
-    loader = new RandomGraphLoader(1024, 0.30);
+    loader = new RandomGraphLoader(2048, 0.30);
 //    loader = IIDFileLoader.create("/home/brian/src/IID/250/4.00/graph_2835");
 //    loader = LinkedInFileLoader.create("/home/brian/git/sanyanse/test/Sample3Colorable.3color");
 //    loader = new PetersenLoader();
@@ -52,8 +52,13 @@ public class SanYanSe
       return;
     }
 
+//    processGraph(graph, graphName);
     graph.SortByMetric(graph.Decomposition.getCentrality(graph));
+    processGraph(graph, graphName);
+  }
 
+  private static void processGraph(Graph graph, String graphName)
+  {
     System.out.println("graph spec");
     StdoutGraphSpecWriter.create().write(graph);
     System.out.println();
@@ -67,7 +72,6 @@ public class SanYanSe
     MultiColorer mc = MultiColorer.create(executor, colorers);
 
     StopWatch stopWatch = new StopWatch();
-
     stopWatch.start();
 
     try
