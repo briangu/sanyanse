@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.sanyanse.common.ColorableNode;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphLoader;
@@ -49,6 +51,18 @@ public class IIDFileLoader implements GraphLoader
 
     if (nodeCnt == -1) {
       throw new IllegalArgumentException("file does not contain node count");
+    }
+
+    // make sure all nodes are uniconnected
+    for (ColorableNode node : builder.Nodes)
+    {
+      Set<ColorableNode> edges = builder.EdgeMap.get(node.Id);
+
+      for (ColorableNode neighbor : edges)
+      {
+
+        builder.EdgeMap.get(neighbor.Id).add(node);
+      }
     }
 
     return builder.build();
