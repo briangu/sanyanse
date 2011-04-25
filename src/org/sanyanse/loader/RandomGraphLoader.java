@@ -1,9 +1,15 @@
 package org.sanyanse.loader;
 
 
-import java.lang.reflect.Array;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphLoader;
@@ -81,7 +87,7 @@ public class RandomGraphLoader implements GraphLoader
 
         neighbors.addAll(neighbors);
 
-        sum += neighbors.size() / (double )nodeCnt;
+        sum += neighbors.size() / (double )(nodeCnt - bucketSize);
       }
     }
 
