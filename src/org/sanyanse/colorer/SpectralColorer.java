@@ -29,7 +29,7 @@ public class SpectralColorer implements GraphColorer
     throws Exception
   {
     Graph gPrime = computeGPrime(_spec);
-    GraphDecomposition comp = GraphDecomposition.computeGraphDecomposition(gPrime);
+    GraphDecomposition comp = gPrime.Decomposition;
     computeSpectrum(comp);
     return null;
   }

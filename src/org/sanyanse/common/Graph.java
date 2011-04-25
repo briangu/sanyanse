@@ -1,9 +1,7 @@
 package org.sanyanse.common;
 
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class Graph
@@ -11,21 +9,37 @@ public class Graph
   public final int NodeCount;
   public final ColorableNode[] Nodes;
   public final Map<String, ColorableNode> NodeMap;
-  public final Map<String, Set<String>> EdgeMap;
+  public final Map<String, Set<ColorableNode>> EdgeMap;
   public final double EdgeProbability;
+  public final GraphDecomposition Decomposition;
 
   public Graph(
     int nodeCnt,
     ColorableNode[] nodes,
     Map<String, ColorableNode> nodeMap,
     double p,
-    Map<String, Set<String>> edgeMap)
+    Map<String, Set<ColorableNode>> edgeMap,
+    GraphDecomposition decomposition)
   {
     NodeCount = nodeCnt;
     Nodes = nodes;
     NodeMap = nodeMap;
     EdgeProbability = p;
     EdgeMap = edgeMap;
+    Decomposition = decomposition;
+  }
+
+  public void SortByMetric(final Map<String, Double> metric)
+  {
+    Arrays.sort(Nodes, new Comparator<ColorableNode>()
+    {
+      @Override
+      public int compare(ColorableNode colorableNode, ColorableNode colorableNode1)
+      {
+        // descending
+        return metric.get(colorableNode1.Id).compareTo(metric.get(colorableNode.Id));
+      }
+    });
   }
 
   public Graph clone()

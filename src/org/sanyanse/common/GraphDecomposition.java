@@ -3,6 +3,8 @@ package org.sanyanse.common;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -19,10 +21,23 @@ public class GraphDecomposition
   private ReentrantReadWriteLock _rwlAdjSpectrum = new ReentrantReadWriteLock();
   private ReentrantReadWriteLock _rwlLapSpectrum = new ReentrantReadWriteLock();
 
+  private int _length;
+
   public GraphDecomposition(Matrix adj, Matrix deg)
   {
     _adjacency = adj;
     _degree = deg;
+    _length = _adjacency.getColumnDimension();
+  }
+
+  public int getLength()
+  {
+    return _length;
+  }
+
+  public int getHeight()
+  {
+    return _length;
   }
 
   public Matrix getAdjacency()
@@ -33,6 +48,20 @@ public class GraphDecomposition
   public Matrix getDegree()
   {
     return _degree;
+  }
+
+  public Map<String, Double> getCentrality(Graph graph)
+  {
+    Map<String, Double> metric = new HashMap<String, Double>(graph.NodeCount);
+    EigenvalueDecomposition e = getAdjacencySpectrum();
+    Matrix V = e.getV();
+
+    for (int i = 0; i < _length; i++)
+    {
+      metric.put(graph.Nodes[i].Id, V.get(i, _length - 1));
+    }
+
+    return metric;
   }
 
   public Matrix getLaplacian()
@@ -116,21 +145,13 @@ public class GraphDecomposition
     return result;
   }
 
-  public static void computeSpectrum(GraphDecomposition comp) {
-    Matrix adj = comp.getAdjacency();
-    EigenvalueDecomposition e = adj.eig();
-    Matrix V = e.getV();
-    Matrix maxV = V.getMatrix(0, adj.getRowDimension() - 1, 0, 0);
-    Matrix maxV2 = V.getMatrix(0, adj.getRowDimension() - 1, 1, 1);
-  }
-
-  public static GraphDecomposition computeGraphDecomposition(Graph graph)
+  private static GraphDecomposition computeGraphDecomposition(Graph graph)
   {
     Matrix adj = new Matrix(graph.NodeCount, graph.NodeCount);
     Matrix deg = new Matrix(graph.NodeCount, graph.NodeCount);
 
     ColorableNode[] nodes = graph.Nodes;
-    Map<String, Set<String>> edgeMap = graph.EdgeMap;
+    Map<String, Set<ColorableNode>> edgeMap = graph.EdgeMap;
 
     int nodeCnt = graph.NodeCount;
 

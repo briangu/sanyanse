@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+
+import org.sanyanse.colorer.BasicBacktrackColorer;
 import org.sanyanse.colorer.CompactGeneticAlgorithmColorer;
 import org.sanyanse.colorer.MultiColorer;
-import org.sanyanse.common.ColoringResult;
-import org.sanyanse.common.Graph;
-import org.sanyanse.common.GraphColorer;
-import org.sanyanse.common.GraphLoader;
+import org.sanyanse.common.*;
 import org.sanyanse.loader.LinkedInFileLoader;
+import org.sanyanse.loader.RandomGraphLoader;
 import org.sanyanse.writer.StdoutGraphSpecWriter;
 import org.sanyanse.writer.StdoutResultWriter;
 
@@ -41,9 +41,9 @@ public class SanYanSe
     String graphName = args.length > 0 ? args[0] : "memory";
 
     //= LinkedInFileLoader.create(args[0]);
-//    loader = new RandomGraphLoader(15, 0.30);
+    loader = new RandomGraphLoader(30, 0.10);
 //    loader = IIDFileLoader.create("/home/brian/src/IID/250/4.00/graph_2835");
-    loader = LinkedInFileLoader.create("/Users/bguarrac/workspace/sanyanse/test/Sample3Colorable.3color");
+//    loader = LinkedInFileLoader.create("/home/brian/git/sanyanse/test/Sample3Colorable.3color");
 //    loader = new PetersenLoader();
     Graph graph = loader.load();
     if (graph == null)
@@ -52,17 +52,23 @@ public class SanYanSe
       return;
     }
 
+    graph.SortByMetric(graph.Decomposition.getCentrality(graph));
+
     System.out.println("graph spec");
     StdoutGraphSpecWriter.create().write(graph);
     System.out.println();
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
-//    colorers.add(new BasicBacktrackColorer(graph));
-    colorers.add(CompactGeneticAlgorithmColorer.create(graph, 0.05));
+    colorers.add(new BasicBacktrackColorer(graph));
+//    colorers.add(CompactGeneticAlgorithmColorer.create(graph, 0.05));
 //    colorers.add(new SpectralColorer(graph, 0.35));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new SimpleThreadFactory());
     MultiColorer mc = MultiColorer.create(executor, colorers);
+
+    StopWatch stopWatch = new StopWatch();
+
+    stopWatch.start();
 
     try
     {
@@ -71,6 +77,10 @@ public class SanYanSe
       {
         result = ColoringResult.createNotColorableResult();
       }
+
+      stopWatch.stop();
+      System.out.println(String.format("elapsed time: %s", stopWatch.getDuration()));
+      System.out.println();
 
       String outfileName = String.format("%s_%s_out", "sanyanse", graphName);
       StdoutResultWriter.create().write(result);
