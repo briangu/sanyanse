@@ -7,6 +7,12 @@ public class ColorableNode
   public Integer Color;
   public ColorableNode[] Edges;
 
+  public ColorableNode(ColorableNode node)
+  {
+    Id = node.Id;
+    Color = node.Color;
+  }
+
   public ColorableNode(String id)
   {
     this(id, 0);

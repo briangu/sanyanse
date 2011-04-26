@@ -3,15 +3,11 @@ package org.sanyanse.common;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.ejml.alg.dense.decomposition.EigenDecomposition;
 import org.ejml.alg.dense.decomposition.eig.EigenPowerMethod;
 import org.ejml.data.DenseMatrix64F;
-import org.ejml.data.Eigenpair;
-import org.ejml.data.Matrix64F;
 import org.ejml.ops.CommonOps;
-import org.ejml.ops.EigenOps;
 
 
 public class GraphDecomposition
@@ -161,5 +157,30 @@ public class GraphDecomposition
     _rwlLapSpectrum.readLock().unlock();
 
     return result;
+  }
+
+  public static GraphDecomposition createFrom(Graph graph)
+  {
+    DenseMatrix64F adjacency = new DenseMatrix64F(graph.NodeCount, graph.NodeCount);
+    DenseMatrix64F degree = new DenseMatrix64F(graph.NodeCount, graph.NodeCount);
+
+    Map<String, ColorableNode> nodeMap = graph.NodeMap;
+
+    for (int i = 0; i < graph.NodeCount; i++)
+    {
+      String nodeId = Util.getNodeName(i);
+
+      Set<ColorableNode> edgeSet = graph.EdgeMap.get(nodeId);
+
+      degree.set(i,i, edgeSet.size());
+
+      for (int j = 0; j < graph.NodeCount; j++)
+      {
+        String neighborId = Util.getNodeName(i);
+        adjacency.set(i, j, edgeSet.contains(nodeMap.get(neighborId)));
+      }
+    }
+
+    return new GraphDecomposition(adjacency, degree);
   }
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import org.sanyanse.colorer.BacktrackColorer;
 import org.sanyanse.colorer.CentralityBacktrackColorer;
 import org.sanyanse.colorer.MultiColorer;
 import org.sanyanse.common.ColoringResult;
@@ -16,7 +15,6 @@ import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphLoader;
 import org.sanyanse.common.StopWatch;
 import org.sanyanse.loader.LinkedInFileLoader;
-import org.sanyanse.loader.RandomGraphLoader;
 import org.sanyanse.writer.FileResultWriter;
 import org.sanyanse.writer.StdoutGraphSpecWriter;
 
@@ -104,11 +102,11 @@ public class SanYanSe
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
 
-    colorers.add(new BacktrackColorer(graph));
-//    colorers.add(new CentralityBacktrackColorer(graph));
+//    colorers.add(new BacktrackColorer(graph));
+    colorers.add(new CentralityBacktrackColorer(graph));
 
-    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
-                                                            new SimpleThreadFactory());
+//    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    ExecutorService executor = Executors.newCachedThreadPool();
     colorer = MultiColorer.create(executor, colorers);
 
     try

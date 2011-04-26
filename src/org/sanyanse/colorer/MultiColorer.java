@@ -12,9 +12,9 @@ import org.sanyanse.common.GraphColorer;
 public class MultiColorer implements GraphColorer
 {
   List<GraphColorer> _colorers;
-  Executor _exec;
+  ExecutorService _exec;
 
-  private MultiColorer(Executor e, List<GraphColorer> colorers)
+  private MultiColorer(ExecutorService e, List<GraphColorer> colorers)
   {
     _exec = e;
     _colorers = colorers;
@@ -28,7 +28,7 @@ public class MultiColorer implements GraphColorer
     return result;
   }
 
-  private static ColoringResult color(Executor e, List<GraphColorer> colorers)
+  private static ColoringResult color(ExecutorService e, List<GraphColorer> colorers)
       throws InterruptedException
   {
     CompletionService<ColoringResult> ecs = new ExecutorCompletionService<ColoringResult>(e);
@@ -73,7 +73,7 @@ public class MultiColorer implements GraphColorer
     return result;
   }
 
-  public static MultiColorer create(Executor e, List<GraphColorer> colorers)
+  public static MultiColorer create(ExecutorService e, List<GraphColorer> colorers)
   {
     return new MultiColorer(e, colorers);
   }

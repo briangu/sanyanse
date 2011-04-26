@@ -7,26 +7,23 @@ import java.util.*;
 public class Graph
 {
   public final int NodeCount;
+  public final double EdgeProbability;
   public final ColorableNode[] Nodes;
   public final Map<String, ColorableNode> NodeMap;
   public final Map<String, Set<ColorableNode>> EdgeMap;
-  public final double EdgeProbability;
-  public final GraphDecomposition Decomposition;
 
   public Graph(
     int nodeCnt,
     ColorableNode[] nodes,
     Map<String, ColorableNode> nodeMap,
     double p,
-    Map<String, Set<ColorableNode>> edgeMap,
-    GraphDecomposition decomposition)
+    Map<String, Set<ColorableNode>> edgeMap)
   {
     NodeCount = nodeCnt;
     Nodes = nodes;
     NodeMap = nodeMap;
     EdgeProbability = p;
     EdgeMap = edgeMap;
-    Decomposition = decomposition;
   }
 
   public void SortByMetric(final Map<String, Float> metric)
@@ -38,15 +35,35 @@ public class Graph
       {
         // descending
         return metric.get(colorableNode1.Id).compareTo(metric.get(colorableNode.Id));
-//        return metric.get(colorableNode.Id).compareTo(metric.get(colorableNode1.Id));
       }
     });
   }
 
   public Graph clone()
   {
-    GraphBuilder builder = GraphBuilder.createFrom(this);
-    Graph copy = builder.build();
+    ColorableNode[] newNodes = new ColorableNode[NodeCount];
+    Map<String, ColorableNode> newNodeMap = new HashMap<String, ColorableNode>(NodeCount);
+    Map<String, Set<ColorableNode>> newEdgeMap = new HashMap<String, Set<ColorableNode>>(NodeCount);
+
+    for (int i = 0; i < NodeCount; i++)
+    {
+      newNodes[i] = new ColorableNode(Nodes[i]);
+      newNodeMap.put(newNodes[i].Id, newNodes[i]);
+    }
+    for (int i = 0; i < NodeCount; i++)
+    {
+      Set<ColorableNode> newEdges = new HashSet<ColorableNode>(Nodes[i].Edges.length);
+      for (ColorableNode neighbor : Nodes[i].Edges)
+      {
+        newEdges.add(newNodeMap.get(neighbor.Id));
+      }
+
+      newEdgeMap.put(newNodes[i].Id, newEdges);
+      newNodes[i].Edges = newEdges.toArray(new ColorableNode[newEdges.size()]);
+    }
+
+    Graph copy = new Graph(NodeCount, newNodes, newNodeMap, EdgeProbability, newEdgeMap);
+
     return copy;
   }
 

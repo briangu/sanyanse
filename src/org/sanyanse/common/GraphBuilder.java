@@ -1,8 +1,6 @@
 package org.sanyanse.common;
 
 
-import org.ejml.data.DenseMatrix64F;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -118,8 +116,6 @@ public class GraphBuilder
   public Graph build()
   {
     ColorableNode[] nodes = Nodes.toArray(new ColorableNode[NodeCount]);
-    DenseMatrix64F adjacency = new DenseMatrix64F(NodeCount, NodeCount);
-    DenseMatrix64F degree = new DenseMatrix64F(NodeCount, NodeCount);
 
     for (int i = 0; i < NodeCount; i++)
     {
@@ -128,18 +124,9 @@ public class GraphBuilder
       Set<ColorableNode> edgeSet = EdgeMap.get(node.Id);
       final ColorableNode[] edges = edgeSet.toArray(new ColorableNode[edgeSet.size()]);
       node.Edges = edges;
-
-      degree.set(i, i, edges.length);
-
-      for (ColorableNode neighbor : edgeSet)
-      {
-        adjacency.set(i, IndexMap.get(neighbor.Id), 1);
-      }
     }
 
-    GraphDecomposition decomposition = new GraphDecomposition(adjacency, degree);
-
-    Graph graph = new Graph(NodeCount, nodes, NodeMap, EdgeProbability, EdgeMap, decomposition);
+    Graph graph = new Graph(NodeCount, nodes, NodeMap, EdgeProbability, EdgeMap);
 
     return graph;
   }

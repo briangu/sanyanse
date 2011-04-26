@@ -33,7 +33,7 @@ public class BacktrackColorer implements GraphColorer
     {
       while ((arr[k].Color <= 2))
       {
-        arr[k].Color = arr[k].Color + 1;
+        arr[k].Color += 1;
 
         Graph.ColorState state = _graph.analyzeState();
         if (state == Invalid)

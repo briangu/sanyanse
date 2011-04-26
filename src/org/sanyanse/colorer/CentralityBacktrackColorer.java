@@ -4,6 +4,7 @@ package org.sanyanse.colorer;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphColorer;
+import org.sanyanse.common.GraphDecomposition;
 
 
 public class CentralityBacktrackColorer implements GraphColorer
@@ -18,8 +19,9 @@ public class CentralityBacktrackColorer implements GraphColorer
   @Override
   public ColoringResult call()
   {
-//    Graph graph = _graph.clone();
-    _graph.SortByMetric(_graph.Decomposition.getCentrality(_graph));
+    _graph = _graph.clone();
+    GraphDecomposition decomposition = GraphDecomposition.createFrom(_graph);
+    _graph.SortByMetric(decomposition.getCentrality(_graph));
     GraphColorer colorer = new BacktrackColorer(_graph);
 
     ColoringResult result = null;

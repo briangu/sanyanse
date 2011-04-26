@@ -26,8 +26,7 @@ public class FileResultWriter implements ColoringResultWriter
       FileWriter fstream = new FileWriter(_fileName);
       BufferedWriter writer = new BufferedWriter(fstream);
 
-      writer.write(String.format("%s", Boolean.toString(result.IsColored)));
-      writer.write("\n");
+      writer.write(String.format("%s\n", Boolean.toString(result.IsColored)));
 
       if (result.IsColored)
       {
@@ -39,10 +38,9 @@ public class FileResultWriter implements ColoringResultWriter
           ColorableNode node = nodeMap.get(uncoloredNode.Id);
           writer.write(
               String.format(
-                  "%s:%s",
+                  "%s:%s\n",
                   node.Id,
                   node.Color));
-          writer.write("\n");
         }
       }
 
