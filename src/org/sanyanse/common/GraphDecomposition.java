@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.ejml.alg.dense.decomposition.eig.EigenPowerMethod;
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.ops.CommonOps;
+import org.ejml.ops.MatrixFeatures;
 
 
 public class GraphDecomposition
@@ -175,7 +176,7 @@ public class GraphDecomposition
       for (ColorableNode neighbor : info.EdgeSet)
       {
         GraphNodeInfo neighborInfo = nodeMap.get(neighbor.Id);
-        adjacency.set(i, info.Index, info.EdgeSet.contains(neighborInfo.Node) ? 1.0 : 0.0);
+        adjacency.unsafe_set(i, neighborInfo.Index, info.EdgeSet.contains(neighborInfo.Node) ? 1.0 : 0.0);
       }
     }
 
