@@ -18,9 +18,9 @@ public class CentralityBacktrackColorer implements GraphColorer
   @Override
   public ColoringResult call()
   {
-    Graph graph = _graph.clone();
-    graph.SortByMetric(graph.Decomposition.getCentrality(graph));
-    GraphColorer colorer = new BacktrackColorer(graph);
+//    Graph graph = _graph.clone();
+    _graph.SortByMetric(_graph.Decomposition.getCentrality(_graph));
+    GraphColorer colorer = new BacktrackColorer(_graph);
 
     ColoringResult result = null;
     try

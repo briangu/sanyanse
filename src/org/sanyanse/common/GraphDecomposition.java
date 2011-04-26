@@ -5,17 +5,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
+import org.ejml.alg.dense.decomposition.EigenDecomposition;
+import org.ejml.alg.dense.decomposition.eig.EigenPowerMethod;
+import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.Eigenpair;
+import org.ejml.data.Matrix64F;
+import org.ejml.ops.CommonOps;
+import org.ejml.ops.EigenOps;
 
 
 public class GraphDecomposition
 {
-  private Matrix _adjacency;
-  private Matrix _degree;
-  private volatile Matrix _laplacian = null;
-  private volatile EigenvalueDecomposition _adjSpectrum = null;
-  private volatile EigenvalueDecomposition _lapSpectrum = null;
+  private DenseMatrix64F _adjacency;
+  private DenseMatrix64F _degree;
+  private volatile DenseMatrix64F _laplacian = null;
+  private volatile DenseMatrix64F _adjSpectrum = null;
+  private volatile DenseMatrix64F _lapSpectrum = null;
 
   private ReentrantReadWriteLock _rwlLaplacian = new ReentrantReadWriteLock();
   private ReentrantReadWriteLock _rwlAdjSpectrum = new ReentrantReadWriteLock();
@@ -23,11 +28,11 @@ public class GraphDecomposition
 
   private int _length;
 
-  public GraphDecomposition(Matrix adj, Matrix deg)
+  public GraphDecomposition(DenseMatrix64F adj, DenseMatrix64F deg)
   {
     _adjacency = adj;
     _degree = deg;
-    _length = _adjacency.getColumnDimension();
+    _length = _adjacency.numCols;
   }
 
   public int getLength()
@@ -40,12 +45,12 @@ public class GraphDecomposition
     return _length;
   }
 
-  public Matrix getAdjacency()
+  public DenseMatrix64F getAdjacency()
   {
     return _adjacency;
   }
 
-  public Matrix getDegree()
+  public DenseMatrix64F getDegree()
   {
     return _degree;
   }
@@ -53,21 +58,21 @@ public class GraphDecomposition
   public Map<String, Float> getCentrality(Graph graph)
   {
     Map<String, Float> metric = new HashMap<String, Float>(graph.NodeCount);
-    EigenvalueDecomposition e = getAdjacencySpectrum();
-    Matrix eigenvectors = e.getV();
+    DenseMatrix64F e = getAdjacencySpectrum();
+    double[] f = e.data;
     int j = _length-1;
 
     for (int i = 0; i < _length; i++)
     {
-      metric.put(graph.Nodes[i].Id, (float)eigenvectors.get(i, j));
+      metric.put(graph.Nodes[i].Id, (float) f[i]);
     }
 
     return metric;
   }
 
-  public Matrix getLaplacian()
+  public DenseMatrix64F getLaplacian()
   {
-    Matrix result;
+    DenseMatrix64F result;
 
     _rwlLaplacian.readLock().lock();
 
@@ -78,7 +83,8 @@ public class GraphDecomposition
 
       if (_laplacian == null)
       {
-        _laplacian = _degree.minus(_adjacency);
+        _laplacian = new DenseMatrix64F(_length*_length);
+        CommonOps.sub(_degree, _adjacency, _laplacian);
       }
 
       _rwlLaplacian.readLock().lock();
@@ -92,9 +98,9 @@ public class GraphDecomposition
     return result;
   }
 
-  public EigenvalueDecomposition getAdjacencySpectrum()
+  public DenseMatrix64F getAdjacencySpectrum()
   {
-    EigenvalueDecomposition result;
+    DenseMatrix64F result;
 
     _rwlAdjSpectrum.readLock().lock();
 
@@ -105,7 +111,16 @@ public class GraphDecomposition
 
       if (_adjSpectrum == null)
       {
-        _adjSpectrum = _adjacency.eig();
+//        Eigenpair pair = EigenOps.dominantEigenpair(_adjacency);
+//        _adjSpectrum = pair.vector;
+        EigenPowerMethod epm = new EigenPowerMethod(_length);
+        epm.setOptions(10, 0.5);
+        boolean converged = epm.computeShiftInvert(_adjacency, 0.5);
+        if (!converged)
+        {
+          System.out.println("failed to converge");
+        }
+        _adjSpectrum = epm.getEigenVector();
       }
 
       _rwlAdjSpectrum.readLock().lock();
@@ -119,9 +134,9 @@ public class GraphDecomposition
     return result;
   }
 
-  public EigenvalueDecomposition getLaplacianSpectrum()
+  public DenseMatrix64F getLaplacianSpectrum()
   {
-    EigenvalueDecomposition result;
+    DenseMatrix64F result;
 
     _rwlLapSpectrum.readLock().lock();
 
@@ -132,7 +147,9 @@ public class GraphDecomposition
 
       if (_lapSpectrum == null)
       {
-        _lapSpectrum = getLaplacian().eig();
+        EigenPowerMethod epm = new EigenPowerMethod(_length*_length);
+        epm.computeDirect(getLaplacian());
+        _lapSpectrum = epm.getEigenVector();
       }
 
       _rwlLapSpectrum.readLock().lock();

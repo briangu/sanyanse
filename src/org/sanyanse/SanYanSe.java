@@ -58,7 +58,7 @@ public class SanYanSe
     String graphName = new File(readFile).getName();
 
     GraphLoader loader = LinkedInFileLoader.create(readFile);
-    loader = new RandomGraphLoader(8, 0.30);
+//    loader = new RandomGraphLoader(8, 0.30);
     Graph graph = loader.load();
     if (graph == null)
     {
@@ -105,7 +105,7 @@ public class SanYanSe
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
 
     colorers.add(new BacktrackColorer(graph));
-    colorers.add(new CentralityBacktrackColorer(graph));
+//    colorers.add(new CentralityBacktrackColorer(graph));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
                                                             new SimpleThreadFactory());

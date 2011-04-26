@@ -7,6 +7,7 @@ import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphColorer;
 
 import static org.sanyanse.common.Graph.ColorState.Complete;
+import static org.sanyanse.common.Graph.ColorState.Invalid;
 import static org.sanyanse.common.Graph.ColorState.PartialValid;
 
 
@@ -35,14 +36,18 @@ public class BacktrackColorer implements GraphColorer
         arr[k].Color = arr[k].Color + 1;
 
         Graph.ColorState state = _graph.analyzeState();
-        if (state == Complete)
+        if (state == Invalid)
+        {
+          continue;
+        }
+        else if (state == PartialValid)
+        {
+          k++;
+        }
+        else if (state == Complete)
         {
           isColored = true;
           break;
-        }
-        if (state == PartialValid)
-        {
-          k++;
         }
       }
 

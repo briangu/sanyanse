@@ -38,6 +38,7 @@ public class Graph
       {
         // descending
         return metric.get(colorableNode1.Id).compareTo(metric.get(colorableNode.Id));
+//        return metric.get(colorableNode.Id).compareTo(metric.get(colorableNode1.Id));
       }
     });
   }
@@ -81,9 +82,9 @@ public class Graph
   {
     ColorState state = ColorState.Complete;
 
-    for (int i = Nodes.length - 1; i >= 0; i--)
+    for (int i = NodeCount - 1; i >= 0; i--)
     {
-      long color = Nodes[i].Color;
+      int color = Nodes[i].Color;
       if (color == 0)
       {
         state = ColorState.PartialValid;
@@ -91,8 +92,6 @@ public class Graph
       }
 
       ColorableNode[] row = Nodes[i].Edges;
-
-      // TODO: explore leveraging undirected nature of connection matrix
 
       for (int x = 0; x < row.length; x++)
       {

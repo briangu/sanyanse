@@ -1,6 +1,8 @@
 package org.sanyanse.common;
 
 
+import org.ejml.data.DenseMatrix64F;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import Jama.Matrix;
 
 
 public class GraphBuilder
@@ -118,8 +118,8 @@ public class GraphBuilder
   public Graph build()
   {
     ColorableNode[] nodes = Nodes.toArray(new ColorableNode[NodeCount]);
-    Matrix adjacency = new Matrix(NodeCount, NodeCount);
-    Matrix degree = new Matrix(NodeCount, NodeCount);
+    DenseMatrix64F adjacency = new DenseMatrix64F(NodeCount, NodeCount);
+    DenseMatrix64F degree = new DenseMatrix64F(NodeCount, NodeCount);
 
     for (int i = 0; i < NodeCount; i++)
     {
