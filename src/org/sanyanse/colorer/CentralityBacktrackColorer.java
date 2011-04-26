@@ -29,7 +29,12 @@ public class CentralityBacktrackColorer implements GraphColorer
     }
     catch (Exception e)
     {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
+    }
+
+    if (result != null)
+    {
+      System.out.println("centrality finished");
     }
 
     return result;

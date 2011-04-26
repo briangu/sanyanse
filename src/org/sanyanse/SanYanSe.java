@@ -64,17 +64,39 @@ public class SanYanSe
       return;
     }
 
-    processGraph(graph, graphName);
-  }
+    StopWatch stopWatch = null;
 
-  private static void processGraph(Graph graph, String graphName)
-  {
     if (_debug)
     {
       System.out.println("graph spec");
       StdoutGraphSpecWriter.create().write(graph);
       System.out.println();
+
+      stopWatch = new StopWatch();
+      stopWatch.start();
     }
+
+    ColoringResult result = processGraph(graph);
+    if (result == null)
+    {
+      System.out.println("failed to color graph");
+      return;
+    }
+
+    if (_debug)
+    {
+      stopWatch.stop();
+      System.out.println(String.format("elapsed time: %s", stopWatch.getDuration()));
+      System.out.println();
+    }
+
+    String outfileName = String.format("%s_%s_out", "sanyanse", graphName);
+    FileResultWriter.create(outfileName).write(result, graph);
+  }
+
+  private static ColoringResult processGraph(Graph graph)
+  {
+    ColoringResult result = null;
 
     GraphColorer colorer;
 
@@ -87,37 +109,21 @@ public class SanYanSe
                                                             new SimpleThreadFactory());
     colorer = MultiColorer.create(executor, colorers);
 
-    StopWatch stopWatch = null;
-
-    if (_debug)
-    {
-      stopWatch = new StopWatch();
-      stopWatch.start();
-    }
-
     try
     {
-      ColoringResult result = colorer.call();
+      result = colorer.call();
       if (result == null)
       {
         result = ColoringResult.createNotColorableResult();
       }
-
-      if (_debug)
-      {
-        stopWatch.stop();
-        System.out.println(String.format("elapsed time: %s", stopWatch.getDuration()));
-        System.out.println();
-      }
-
-      String outfileName = String.format("%s_%s_out", "sanyanse", graphName);
-      FileResultWriter.create(outfileName).write(result);
     }
     catch (Exception e)
     {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     }
 
     executor.shutdown();
+
+    return result;
   }
 }

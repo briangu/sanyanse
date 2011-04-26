@@ -58,6 +58,8 @@ public class BacktrackColorer implements GraphColorer
         ? ColoringResult.createColoredGraphResult(_graph)
         : ColoringResult.createNotColorableResult();
 
+    System.out.println("bt finished");
+
     return result;
   }
 }
