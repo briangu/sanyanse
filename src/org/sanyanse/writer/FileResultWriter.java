@@ -10,6 +10,7 @@ import org.sanyanse.common.ColorableNode;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.ColoringResultWriter;
 import org.sanyanse.common.Graph;
+import org.sanyanse.common.GraphNodeInfo;
 
 
 public class FileResultWriter implements ColoringResultWriter
@@ -31,11 +32,11 @@ public class FileResultWriter implements ColoringResultWriter
       if (result.IsColored)
       {
         Graph coloredGraph = result.Graph;
-        Map<String, ColorableNode> nodeMap = coloredGraph.NodeMap;
+        Map<String, GraphNodeInfo> nodeMap = coloredGraph.NodeMap;
 
         for (ColorableNode uncoloredNode : origGraph.Nodes)
         {
-          ColorableNode node = nodeMap.get(uncoloredNode.Id);
+          ColorableNode node = nodeMap.get(uncoloredNode.Id).Node;
           writer.write(
               String.format(
                   "%s:%s\n",

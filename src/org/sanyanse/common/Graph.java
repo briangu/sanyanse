@@ -9,21 +9,18 @@ public class Graph
   public final int NodeCount;
   public final double EdgeProbability;
   public final ColorableNode[] Nodes;
-  public final Map<String, ColorableNode> NodeMap;
-  public final Map<String, Set<ColorableNode>> EdgeMap;
+  public final Map<String, GraphNodeInfo> NodeMap;
 
   public Graph(
     int nodeCnt,
-    ColorableNode[] nodes,
-    Map<String, ColorableNode> nodeMap,
     double p,
-    Map<String, Set<ColorableNode>> edgeMap)
+    ColorableNode[] nodes,
+    Map<String, GraphNodeInfo> nodeMap)
   {
     NodeCount = nodeCnt;
     Nodes = nodes;
     NodeMap = nodeMap;
     EdgeProbability = p;
-    EdgeMap = edgeMap;
   }
 
   public void SortByMetric(final Map<String, Float> metric)
@@ -37,32 +34,38 @@ public class Graph
         return metric.get(colorableNode1.Id).compareTo(metric.get(colorableNode.Id));
       }
     });
+
+    for (int i = 0; i < NodeCount; i++)
+    {
+      ColorableNode node = Nodes[i];
+      NodeMap.get(node.Id).Index = i;
+    }
   }
 
   public Graph clone()
   {
     ColorableNode[] newNodes = new ColorableNode[NodeCount];
-    Map<String, ColorableNode> newNodeMap = new HashMap<String, ColorableNode>(NodeCount);
-    Map<String, Set<ColorableNode>> newEdgeMap = new HashMap<String, Set<ColorableNode>>(NodeCount);
+    Map<String, GraphNodeInfo> newNodeMap = new HashMap<String, GraphNodeInfo>(NodeCount);
 
     for (int i = 0; i < NodeCount; i++)
     {
       newNodes[i] = new ColorableNode(Nodes[i]);
-      newNodeMap.put(newNodes[i].Id, newNodes[i]);
+      newNodeMap.put(newNodes[i].Id, new GraphNodeInfo(newNodes[i], i));
     }
     for (int i = 0; i < NodeCount; i++)
     {
       Set<ColorableNode> newEdges = new HashSet<ColorableNode>(Nodes[i].Edges.length);
+
       for (ColorableNode neighbor : Nodes[i].Edges)
       {
-        newEdges.add(newNodeMap.get(neighbor.Id));
+        newEdges.add(newNodeMap.get(neighbor.Id).Node);
       }
 
-      newEdgeMap.put(newNodes[i].Id, newEdges);
+      newNodeMap.get(newNodes[i].Id).EdgeSet = newEdges;
       newNodes[i].Edges = newEdges.toArray(new ColorableNode[newEdges.size()]);
     }
 
-    Graph copy = new Graph(NodeCount, newNodes, newNodeMap, EdgeProbability, newEdgeMap);
+    Graph copy = new Graph(NodeCount, EdgeProbability, newNodes, newNodeMap);
 
     return copy;
   }
@@ -127,7 +130,7 @@ public class Graph
     int correctRowColorings = 0;
     int correctEdgeColorings = 0;
     boolean hasInvalidColorings = false;
-    Map<String, Integer> edgeColroingsMap = new HashMap<String, Integer>();
+    Map<String, Integer> edgeColoringsMap = new HashMap<String, Integer>();
 
     ColorState state = ColorState.Complete;
 
@@ -161,7 +164,7 @@ public class Graph
         }
       }
 
-      edgeColroingsMap.put(Nodes[i].Id, nodeEdgeColoringCount);
+      edgeColoringsMap.put(Nodes[i].Id, nodeEdgeColoringCount);
 
       if (rowIsCorrectlyColored)
       {
@@ -174,6 +177,6 @@ public class Graph
       state = Graph.ColorState.Invalid;
     }
 
-    return new GraphAnalysis(state, correctEdgeColorings, correctRowColorings, edgeColroingsMap);
+    return new GraphAnalysis(state, correctEdgeColorings, correctRowColorings, edgeColoringsMap);
   }
 }

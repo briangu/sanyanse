@@ -15,9 +15,7 @@ public class GraphBuilder
   public final int NodeCount;
   public final double EdgeProbability;
   public final List<ColorableNode> Nodes;
-  public final Map<String, ColorableNode> NodeMap;
-  public final Map<String, Set<ColorableNode>> EdgeMap;
-  public final Map<String, Integer> IndexMap;
+  public final Map<String, GraphNodeInfo> NodeMap;
 
   public GraphBuilder(int nodeCnt)
   {
@@ -29,87 +27,80 @@ public class GraphBuilder
     NodeCount = nodeCnt;
     EdgeProbability = p;
     Nodes = new ArrayList<ColorableNode>(nodeCnt);
-    NodeMap = new HashMap<String, ColorableNode>(nodeCnt);
-    EdgeMap = new HashMap<String, Set<ColorableNode>>(nodeCnt);
-    IndexMap = new HashMap<String, Integer>(nodeCnt);
+    NodeMap = new HashMap<String, GraphNodeInfo>(nodeCnt);
   }
 
-  public ColorableNode addNode(String nodeId)
+  public GraphNodeInfo addNode(String nodeId)
   {
-    ColorableNode node;
+    GraphNodeInfo info;
 
     if (NodeMap.containsKey(nodeId))
     {
-      node = NodeMap.get(nodeId);
+      info = NodeMap.get(nodeId);
     }
     else
     {
-      node = new ColorableNode(nodeId);
-      NodeMap.put(nodeId, node);
+      info = new GraphNodeInfo(new ColorableNode(nodeId));
+      NodeMap.put(nodeId, info);
     }
 
-    IndexMap.put(nodeId, Nodes.size());
-    Nodes.add(node);
-    EdgeMap.put(nodeId, new HashSet<ColorableNode>());
+    Nodes.add(info.Node);
 
-    return node;
+    return info;
   }
 
-  public ColorableNode addNode(String nodeId, int color)
+  public void addNode(String nodeId, int color)
   {
-    ColorableNode node = addNode(nodeId);
-    node.Color = color;
-    return node;
+    GraphNodeInfo info = addNode(nodeId);
+    info.Node.Color = color;
   }
 
-  public ColorableNode addEdge(String nodeId, String neighborId)
+  public GraphNodeInfo addEdge(String nodeId, String neighborId)
   {
     if (!NodeMap.containsKey(neighborId))
     {
-      NodeMap.put(neighborId, new ColorableNode(neighborId));
+      NodeMap.put(neighborId, new GraphNodeInfo(new ColorableNode(neighborId)));
     }
-    ColorableNode neighborNode = NodeMap.get(neighborId);
+    GraphNodeInfo neighborInfo = NodeMap.get(neighborId);
 
-    EdgeMap.get(nodeId).add(neighborNode);
+    NodeMap.get(nodeId).EdgeSet.add(neighborInfo.Node);
 
-    return neighborNode;
+    return neighborInfo;
   }
 
-  public ColorableNode addEdge(String nodeId, String neighborId, int color)
+  public void addEdge(String nodeId, String neighborId, int color)
   {
-    ColorableNode neighborNode = addEdge(nodeId, neighborId);
-    neighborNode.Color = color;
-    return neighborNode;
+    GraphNodeInfo neighborInfo = addEdge(nodeId, neighborId);
+    neighborInfo.Node.Color = color;
   }
 
-  public ColorableNode addNode(String nodeId, String[] edges)
+  public GraphNodeInfo addNode(String nodeId, String[] edges)
   {
     return addNode(nodeId, new HashSet<String>(Arrays.asList(edges)));
   }
 
-  public ColorableNode addNode(String nodeId, Set<String> edges)
+  public GraphNodeInfo addNode(String nodeId, Set<String> edges)
   {
-    ColorableNode node = addNode(nodeId);
+    GraphNodeInfo info = addNode(nodeId);
     for (String neighborId : edges)
     {
       addEdge(nodeId, neighborId);
     }
-    return node;
+    return info;
   }
 
   public void removeNode(String nodeId)
   {
     if (!NodeMap.containsKey(nodeId)) return;
 
-    ColorableNode node = NodeMap.get(nodeId);
+    GraphNodeInfo info = NodeMap.get(nodeId);
 
-    Nodes.remove(nodeId);
-    EdgeMap.remove(nodeId);
+    Nodes.remove(info.Node);
     NodeMap.remove(nodeId);
 
-    for (Set<ColorableNode> edgeSet : EdgeMap.values())
+    for (GraphNodeInfo mapInfo : NodeMap.values())
     {
-      edgeSet.remove(node);
+      mapInfo.EdgeSet.remove(info.Node);
     }
   }
 
@@ -120,13 +111,12 @@ public class GraphBuilder
     for (int i = 0; i < NodeCount; i++)
     {
       final ColorableNode node = nodes[i];
-
-      Set<ColorableNode> edgeSet = EdgeMap.get(node.Id);
-      final ColorableNode[] edges = edgeSet.toArray(new ColorableNode[edgeSet.size()]);
-      node.Edges = edges;
+      final GraphNodeInfo info = NodeMap.get(node.Id);
+      info.Index = i;
+      node.Edges = info.EdgeSet.toArray(new ColorableNode[info.EdgeSet.size()]);
     }
 
-    Graph graph = new Graph(NodeCount, nodes, NodeMap, EdgeProbability, EdgeMap);
+    Graph graph = new Graph(NodeCount, EdgeProbability, nodes, NodeMap);
 
     return graph;
   }

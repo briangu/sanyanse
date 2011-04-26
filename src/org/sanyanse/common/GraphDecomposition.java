@@ -3,7 +3,6 @@ package org.sanyanse.common;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.ejml.alg.dense.decomposition.eig.EigenPowerMethod;
 import org.ejml.data.DenseMatrix64F;
@@ -164,20 +163,19 @@ public class GraphDecomposition
     DenseMatrix64F adjacency = new DenseMatrix64F(graph.NodeCount, graph.NodeCount);
     DenseMatrix64F degree = new DenseMatrix64F(graph.NodeCount, graph.NodeCount);
 
-    Map<String, ColorableNode> nodeMap = graph.NodeMap;
+    Map<String, GraphNodeInfo> nodeMap = graph.NodeMap;
 
     for (int i = 0; i < graph.NodeCount; i++)
     {
-      String nodeId = Util.getNodeName(i);
+      ColorableNode node = graph.Nodes[i];
+      GraphNodeInfo info = graph.NodeMap.get(node.Id);
 
-      Set<ColorableNode> edgeSet = graph.EdgeMap.get(nodeId);
+      degree.set(i, i, info.EdgeSet.size());
 
-      degree.set(i,i, edgeSet.size());
-
-      for (int j = 0; j < graph.NodeCount; j++)
+      for (ColorableNode neighbor : info.EdgeSet)
       {
-        String neighborId = Util.getNodeName(i);
-        adjacency.set(i, j, edgeSet.contains(nodeMap.get(neighborId)));
+        GraphNodeInfo neighborInfo = nodeMap.get(neighbor.Id);
+        adjacency.set(i, info.Index, info.EdgeSet.contains(neighborInfo.Node) ? 1.0 : 0.0);
       }
     }
 

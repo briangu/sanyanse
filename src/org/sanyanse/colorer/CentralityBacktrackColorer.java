@@ -34,10 +34,7 @@ public class CentralityBacktrackColorer implements GraphColorer
       e.printStackTrace();
     }
 
-    if (result != null)
-    {
-      System.out.println("centrality finished");
-    }
+    System.out.println("centrality finished");
 
     return result;
   }
