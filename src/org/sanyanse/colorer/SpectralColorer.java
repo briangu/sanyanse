@@ -1,7 +1,6 @@
 package org.sanyanse.colorer;
 
 
-import org.jblas.FloatMatrix;
 import org.sanyanse.common.ColorableNode;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.Graph;
@@ -51,9 +50,9 @@ public class SpectralColorer implements GraphColorer
   }
 
   public static void computeSpectrum(GraphDecomposition comp) {
-    FloatMatrix[] e = comp.getAdjacencySpectrum();
 
 /*
+    FloatMatrix[] e = comp.getAdjacencySpectrum();
     Matrix V = e.getV();
 
 //    Matrix maxV = V.getMatrix(0, adj.getRowDimension() - 1, adj.getColumnDimension() - 1, adj.getColumnDimension() - 1);

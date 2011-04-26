@@ -4,17 +4,18 @@ package org.sanyanse.common;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.jblas.Eigen;
-import org.jblas.FloatMatrix;
+
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
 
 
 public class GraphDecomposition
 {
-  private FloatMatrix _adjacency;
-  private FloatMatrix _degree;
-  private volatile FloatMatrix _laplacian = null;
-  private volatile FloatMatrix[] _adjSpectrum = null;
-  private volatile FloatMatrix[] _lapSpectrum = null;
+  private Matrix _adjacency;
+  private Matrix _degree;
+  private volatile Matrix _laplacian = null;
+  private volatile EigenvalueDecomposition _adjSpectrum = null;
+  private volatile EigenvalueDecomposition _lapSpectrum = null;
 
   private ReentrantReadWriteLock _rwlLaplacian = new ReentrantReadWriteLock();
   private ReentrantReadWriteLock _rwlAdjSpectrum = new ReentrantReadWriteLock();
@@ -22,11 +23,11 @@ public class GraphDecomposition
 
   private int _length;
 
-  public GraphDecomposition(FloatMatrix adj, FloatMatrix deg)
+  public GraphDecomposition(Matrix adj, Matrix deg)
   {
     _adjacency = adj;
     _degree = deg;
-    _length = _adjacency.columns;
+    _length = _adjacency.getColumnDimension();
   }
 
   public int getLength()
@@ -39,12 +40,12 @@ public class GraphDecomposition
     return _length;
   }
 
-  public FloatMatrix getAdjacency()
+  public Matrix getAdjacency()
   {
     return _adjacency;
   }
 
-  public FloatMatrix getDegree()
+  public Matrix getDegree()
   {
     return _degree;
   }
@@ -52,21 +53,21 @@ public class GraphDecomposition
   public Map<String, Float> getCentrality(Graph graph)
   {
     Map<String, Float> metric = new HashMap<String, Float>(graph.NodeCount);
-    FloatMatrix[] e = getAdjacencySpectrum();
-    FloatMatrix eigenvectors = e[0];
-    int j = eigenvectors.getColumns()-1;
+    EigenvalueDecomposition e = getAdjacencySpectrum();
+    Matrix eigenvectors = e.getV();
+    int j = _length-1;
 
     for (int i = 0; i < _length; i++)
     {
-      metric.put(graph.Nodes[i].Id, eigenvectors.get(i, j));
+      metric.put(graph.Nodes[i].Id, (float)eigenvectors.get(i, j));
     }
 
     return metric;
   }
 
-  public FloatMatrix getLaplacian()
+  public Matrix getLaplacian()
   {
-    FloatMatrix result;
+    Matrix result;
 
     _rwlLaplacian.readLock().lock();
 
@@ -77,7 +78,7 @@ public class GraphDecomposition
 
       if (_laplacian == null)
       {
-        _laplacian = _degree.sub(_adjacency);
+        _laplacian = _degree.minus(_adjacency);
       }
 
       _rwlLaplacian.readLock().lock();
@@ -91,9 +92,9 @@ public class GraphDecomposition
     return result;
   }
 
-  public FloatMatrix[] getAdjacencySpectrum()
+  public EigenvalueDecomposition getAdjacencySpectrum()
   {
-    FloatMatrix[] result;
+    EigenvalueDecomposition result;
 
     _rwlAdjSpectrum.readLock().lock();
 
@@ -104,7 +105,7 @@ public class GraphDecomposition
 
       if (_adjSpectrum == null)
       {
-        _adjSpectrum = Eigen.symmetricEigenvectors(_adjacency);
+        _adjSpectrum = _adjacency.eig();
       }
 
       _rwlAdjSpectrum.readLock().lock();
@@ -118,9 +119,9 @@ public class GraphDecomposition
     return result;
   }
 
-  public FloatMatrix[] getLaplacianSpectrum()
+  public EigenvalueDecomposition getLaplacianSpectrum()
   {
-    FloatMatrix[] result;
+    EigenvalueDecomposition result;
 
     _rwlLapSpectrum.readLock().lock();
 
@@ -131,7 +132,7 @@ public class GraphDecomposition
 
       if (_lapSpectrum == null)
       {
-        _lapSpectrum = Eigen.symmetricEigenvectors(getLaplacian());
+        _lapSpectrum = getLaplacian().eig();
       }
 
       _rwlLapSpectrum.readLock().lock();

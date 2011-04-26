@@ -16,6 +16,7 @@ import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphLoader;
 import org.sanyanse.common.StopWatch;
 import org.sanyanse.loader.LinkedInFileLoader;
+import org.sanyanse.loader.RandomGraphLoader;
 import org.sanyanse.writer.FileResultWriter;
 import org.sanyanse.writer.StdoutGraphSpecWriter;
 
@@ -57,6 +58,7 @@ public class SanYanSe
     String graphName = new File(readFile).getName();
 
     GraphLoader loader = LinkedInFileLoader.create(readFile);
+    loader = new RandomGraphLoader(8, 0.30);
     Graph graph = loader.load();
     if (graph == null)
     {

@@ -8,7 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.jblas.FloatMatrix;
+
+import Jama.Matrix;
 
 
 public class GraphBuilder
@@ -117,8 +118,8 @@ public class GraphBuilder
   public Graph build()
   {
     ColorableNode[] nodes = Nodes.toArray(new ColorableNode[NodeCount]);
-    FloatMatrix adjacency = new FloatMatrix(NodeCount, NodeCount);
-    FloatMatrix degree = new FloatMatrix(NodeCount, NodeCount);
+    Matrix adjacency = new Matrix(NodeCount, NodeCount);
+    Matrix degree = new Matrix(NodeCount, NodeCount);
 
     for (int i = 0; i < NodeCount; i++)
     {
@@ -128,11 +129,11 @@ public class GraphBuilder
       final ColorableNode[] edges = edgeSet.toArray(new ColorableNode[edgeSet.size()]);
       node.Edges = edges;
 
-      degree.put(i, i, edges.length);
+      degree.set(i, i, edges.length);
 
       for (ColorableNode neighbor : edgeSet)
       {
-        adjacency.put(i, IndexMap.get(neighbor.Id), 1);
+        adjacency.set(i, IndexMap.get(neighbor.Id), 1);
       }
     }
 
