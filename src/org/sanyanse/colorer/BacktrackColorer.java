@@ -10,11 +10,11 @@ import static org.sanyanse.common.Graph.ColorState.Complete;
 import static org.sanyanse.common.Graph.ColorState.PartialValid;
 
 
-public class BasicBacktrackColorer implements GraphColorer
+public class BacktrackColorer implements GraphColorer
 {
   Graph _graph;
 
-  public BasicBacktrackColorer(Graph graph)
+  public BacktrackColorer(Graph graph)
   {
     _graph = graph;
   }

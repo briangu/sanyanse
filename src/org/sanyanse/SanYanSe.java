@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import org.sanyanse.colorer.BasicBacktrackColorer;
+import org.sanyanse.colorer.BacktrackColorer;
+import org.sanyanse.colorer.CentralityBacktrackColorer;
 import org.sanyanse.colorer.MultiColorer;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.Graph;
@@ -56,7 +57,6 @@ public class SanYanSe
     String graphName = new File(readFile).getName();
 
     GraphLoader loader = LinkedInFileLoader.create(readFile);
-//    loader = new RandomGraphLoader(8, 0.30);
     Graph graph = loader.load();
     if (graph == null)
     {
@@ -64,7 +64,6 @@ public class SanYanSe
       return;
     }
 
-    graph.SortByMetric(graph.Decomposition.getCentrality(graph));
     processGraph(graph, graphName);
   }
 
@@ -77,12 +76,16 @@ public class SanYanSe
       System.out.println();
     }
 
+    GraphColorer colorer;
+
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
-    colorers.add(new BasicBacktrackColorer(graph));
+
+    colorers.add(new BacktrackColorer(graph));
+    colorers.add(new CentralityBacktrackColorer(graph));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
                                                             new SimpleThreadFactory());
-    MultiColorer mc = MultiColorer.create(executor, colorers);
+    colorer = MultiColorer.create(executor, colorers);
 
     StopWatch stopWatch = null;
 
@@ -94,7 +97,7 @@ public class SanYanSe
 
     try
     {
-      ColoringResult result = mc.call();
+      ColoringResult result = colorer.call();
       if (result == null)
       {
         result = ColoringResult.createNotColorableResult();
