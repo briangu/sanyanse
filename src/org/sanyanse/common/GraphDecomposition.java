@@ -4,49 +4,47 @@ package org.sanyanse.common;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.ejml.alg.dense.decomposition.eig.EigenPowerMethod;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.MatrixFeatures;
+import org.jblas.Eigen;
+import org.jblas.FloatMatrix;
 
 
 public class GraphDecomposition
 {
-  private DenseMatrix64F _adjacency;
-  private DenseMatrix64F _degree;
-  private volatile DenseMatrix64F _laplacian = null;
-  private volatile DenseMatrix64F _adjSpectrum = null;
-  private volatile DenseMatrix64F _lapSpectrum = null;
+  private FloatMatrix _adjacency;
+  private FloatMatrix _degree;
+  private volatile FloatMatrix _laplacian = null;
+  private volatile FloatMatrix[] _adjSpectrum = null;
+  private volatile FloatMatrix[] _lapSpectrum = null;
 
   private ReentrantReadWriteLock _rwlLaplacian = new ReentrantReadWriteLock();
   private ReentrantReadWriteLock _rwlAdjSpectrum = new ReentrantReadWriteLock();
   private ReentrantReadWriteLock _rwlLapSpectrum = new ReentrantReadWriteLock();
 
-  private int _length;
+  private int _colWidth;
 
-  public GraphDecomposition(DenseMatrix64F adj, DenseMatrix64F deg)
+  private GraphDecomposition(FloatMatrix adj, FloatMatrix deg)
   {
     _adjacency = adj;
     _degree = deg;
-    _length = _adjacency.numCols;
+    _colWidth = _adjacency.getColumns();
   }
 
-  public int getLength()
+  public int getColWidth()
   {
-    return _length;
+    return _colWidth;
   }
 
   public int getHeight()
   {
-    return _length;
+    return _colWidth;
   }
 
-  public DenseMatrix64F getAdjacency()
+  public FloatMatrix getAdjacency()
   {
     return _adjacency;
   }
 
-  public DenseMatrix64F getDegree()
+  public FloatMatrix getDegree()
   {
     return _degree;
   }
@@ -54,21 +52,22 @@ public class GraphDecomposition
   public Map<String, Float> getCentrality(Graph graph)
   {
     Map<String, Float> metric = new HashMap<String, Float>(graph.NodeCount);
-    DenseMatrix64F e = getAdjacencySpectrum();
-    double[] f = e.data;
-    int j = _length-1;
+    FloatMatrix[] e = getAdjacencySpectrum();
+    FloatMatrix ev = e[0];
 
-    for (int i = 0; i < _length; i++)
+    int j = _colWidth -1;
+
+    for (int i = 0; i < _colWidth; i++)
     {
-      metric.put(graph.Nodes[i].Id, (float) f[i]);
+      metric.put(graph.Nodes[i].Id, ev.get(i,j));
     }
 
     return metric;
   }
 
-  public DenseMatrix64F getLaplacian()
+  public FloatMatrix getLaplacian()
   {
-    DenseMatrix64F result;
+    FloatMatrix result;
 
     _rwlLaplacian.readLock().lock();
 
@@ -79,8 +78,7 @@ public class GraphDecomposition
 
       if (_laplacian == null)
       {
-        _laplacian = new DenseMatrix64F(_length*_length);
-        CommonOps.sub(_degree, _adjacency, _laplacian);
+        _laplacian = _degree.sub(_adjacency);
       }
 
       _rwlLaplacian.readLock().lock();
@@ -94,9 +92,9 @@ public class GraphDecomposition
     return result;
   }
 
-  public DenseMatrix64F getAdjacencySpectrum()
+  public FloatMatrix[] getAdjacencySpectrum()
   {
-    DenseMatrix64F result;
+    FloatMatrix[] result;
 
     _rwlAdjSpectrum.readLock().lock();
 
@@ -107,16 +105,7 @@ public class GraphDecomposition
 
       if (_adjSpectrum == null)
       {
-//        Eigenpair pair = EigenOps.dominantEigenpair(_adjacency);
-//        _adjSpectrum = pair.vector;
-        EigenPowerMethod epm = new EigenPowerMethod(_length);
-        epm.setOptions(10, 0.5);
-        boolean converged = epm.computeShiftInvert(_adjacency, 0.5);
-        if (!converged)
-        {
-          System.out.println("failed to converge");
-        }
-        _adjSpectrum = epm.getEigenVector();
+        _adjSpectrum = Eigen.symmetricEigenvectors(_adjacency);
       }
 
       _rwlAdjSpectrum.readLock().lock();
@@ -130,9 +119,9 @@ public class GraphDecomposition
     return result;
   }
 
-  public DenseMatrix64F getLaplacianSpectrum()
+  public FloatMatrix[] getLaplacianSpectrum()
   {
-    DenseMatrix64F result;
+    FloatMatrix[] result;
 
     _rwlLapSpectrum.readLock().lock();
 
@@ -143,9 +132,7 @@ public class GraphDecomposition
 
       if (_lapSpectrum == null)
       {
-        EigenPowerMethod epm = new EigenPowerMethod(_length*_length);
-        epm.computeDirect(getLaplacian());
-        _lapSpectrum = epm.getEigenVector();
+        _lapSpectrum = Eigen.symmetricEigenvectors(getLaplacian());
       }
 
       _rwlLapSpectrum.readLock().lock();
@@ -161,8 +148,8 @@ public class GraphDecomposition
 
   public static GraphDecomposition createFrom(Graph graph)
   {
-    DenseMatrix64F adjacency = new DenseMatrix64F(graph.NodeCount, graph.NodeCount);
-    DenseMatrix64F degree = new DenseMatrix64F(graph.NodeCount, graph.NodeCount);
+    FloatMatrix adjacency = new FloatMatrix(graph.NodeCount, graph.NodeCount);
+    FloatMatrix degree = new FloatMatrix(graph.NodeCount, graph.NodeCount);
 
     Map<String, GraphNodeInfo> nodeMap = graph.NodeMap;
 
@@ -171,12 +158,12 @@ public class GraphDecomposition
       ColorableNode node = graph.Nodes[i];
       GraphNodeInfo info = graph.NodeMap.get(node.Id);
 
-      degree.set(i, i, info.EdgeSet.size());
+      degree.put(i, i, info.EdgeSet.size());
 
       for (ColorableNode neighbor : info.EdgeSet)
       {
         GraphNodeInfo neighborInfo = nodeMap.get(neighbor.Id);
-        adjacency.unsafe_set(i, neighborInfo.Index, info.EdgeSet.contains(neighborInfo.Node) ? 1.0 : 0.0);
+        adjacency.put(i, neighborInfo.Index, info.EdgeSet.contains(neighborInfo.Node) ? 1.0f : 0.0f);
       }
     }
 
