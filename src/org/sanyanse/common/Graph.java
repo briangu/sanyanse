@@ -29,6 +29,25 @@ public class Graph
     EdgeProbability = p;
   }
 
+  public void SortByEdgeCount()
+  {
+    Arrays.sort(Nodes, new Comparator<ColorableNode>()
+    {
+      @Override
+      public int compare(ColorableNode colorableNode, ColorableNode colorableNode1)
+      {
+        // descending
+        return colorableNode1.Edges.length - colorableNode.Edges.length;
+      }
+    });
+
+    for (int i = 0; i < NodeCount; i++)
+    {
+      ColorableNode node = Nodes[i];
+      NodeMap.get(node.Id).Index = i;
+    }
+  }
+
   public void SortByMetric(final FloatMatrix metric)
   {
     final int j = NodeCount - 1;
