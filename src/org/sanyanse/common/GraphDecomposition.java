@@ -1,7 +1,6 @@
 package org.sanyanse.common;
 
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.jblas.Eigen;
@@ -49,20 +48,11 @@ public class GraphDecomposition
     return _degree;
   }
 
-  public Map<String, Float> getCentrality(Graph graph)
+  public FloatMatrix getCentrality()
   {
-    Map<String, Float> metric = new HashMap<String, Float>(graph.NodeCount);
     FloatMatrix[] e = getAdjacencySpectrum();
     FloatMatrix ev = e[0];
-
-    int j = _colWidth -1;
-
-    for (int i = 0; i < _colWidth; i++)
-    {
-      metric.put(graph.Nodes[i].Id, ev.get(i,j));
-    }
-
-    return metric;
+    return ev;
   }
 
   public FloatMatrix getLaplacian()
@@ -149,7 +139,7 @@ public class GraphDecomposition
   public static GraphDecomposition createFrom(Graph graph)
   {
     FloatMatrix adjacency = new FloatMatrix(graph.NodeCount, graph.NodeCount);
-    FloatMatrix degree = new FloatMatrix(graph.NodeCount, graph.NodeCount);
+//    FloatMatrix degree = new FloatMatrix(graph.NodeCount, graph.NodeCount);
 
     Map<String, GraphNodeInfo> nodeMap = graph.NodeMap;
 
@@ -158,7 +148,7 @@ public class GraphDecomposition
       ColorableNode node = graph.Nodes[i];
       GraphNodeInfo info = graph.NodeMap.get(node.Id);
 
-      degree.put(i, i, info.EdgeSet.size());
+//      degree.put(i, i, info.EdgeSet.size());
 
       for (ColorableNode neighbor : info.EdgeSet)
       {
@@ -167,6 +157,6 @@ public class GraphDecomposition
       }
     }
 
-    return new GraphDecomposition(adjacency, degree);
+    return new GraphDecomposition(adjacency, null);
   }
 }

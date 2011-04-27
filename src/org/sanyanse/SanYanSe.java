@@ -57,7 +57,6 @@ public class SanYanSe
     String graphName = new File(readFile).getName();
 
     GraphLoader loader = LinkedInFileLoader.create(readFile);
-//    loader = new RandomGraphLoader(8, 0.30);
     Graph graph = loader.load();
     if (graph == null)
     {

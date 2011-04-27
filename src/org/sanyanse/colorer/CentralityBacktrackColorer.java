@@ -1,6 +1,7 @@
 package org.sanyanse.colorer;
 
 
+import org.jblas.FloatMatrix;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphColorer;
@@ -19,14 +20,19 @@ public class CentralityBacktrackColorer implements GraphColorer
   @Override
   public ColoringResult call()
   {
-    _graph = _graph.clone();
-    GraphDecomposition decomposition = GraphDecomposition.createFrom(_graph);
-    _graph.SortByMetric(decomposition.getCentrality(_graph));
-    GraphColorer colorer = new BacktrackColorer(_graph);
-
     ColoringResult result = null;
     try
     {
+      _graph = _graph.clone();
+      if (Thread.currentThread().isInterrupted()) return null;
+      GraphDecomposition decomposition = GraphDecomposition.createFrom(_graph);
+      if (Thread.currentThread().isInterrupted()) return null;
+      FloatMatrix centrality = decomposition.getCentrality();
+      if (Thread.currentThread().isInterrupted()) return null;
+      _graph.SortByMetric(centrality);
+      if (Thread.currentThread().isInterrupted()) return null;
+      GraphColorer colorer = new BacktrackColorer(_graph);
+
       result = colorer.call();
     }
     catch (Exception e)

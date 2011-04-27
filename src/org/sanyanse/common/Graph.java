@@ -1,7 +1,13 @@
 package org.sanyanse.common;
 
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import org.jblas.FloatMatrix;
 
 
 public class Graph
@@ -23,15 +29,20 @@ public class Graph
     EdgeProbability = p;
   }
 
-  public void SortByMetric(final Map<String, Float> metric)
+  public void SortByMetric(final FloatMatrix metric)
   {
+    final int j = NodeCount - 1;
+
     Arrays.sort(Nodes, new Comparator<ColorableNode>()
     {
       @Override
       public int compare(ColorableNode colorableNode, ColorableNode colorableNode1)
       {
         // descending
-        return metric.get(colorableNode1.Id).compareTo(metric.get(colorableNode.Id));
+        GraphNodeInfo infoA = NodeMap.get(colorableNode.Id);
+        GraphNodeInfo infoB = NodeMap.get(colorableNode1.Id);
+
+        return Float.compare(metric.get(infoB.Index, j), metric.get(infoA.Index, j));
       }
     });
 
