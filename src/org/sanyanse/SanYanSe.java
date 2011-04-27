@@ -106,8 +106,7 @@ public class SanYanSe
     colorers.add(new BacktrackColorer(graph));
     colorers.add(new CentralityBacktrackColorer(graph));
 
-//    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    ExecutorService executor = Executors.newCachedThreadPool();
+    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     colorer = MultiColorer.create(executor, colorers);
 
     try

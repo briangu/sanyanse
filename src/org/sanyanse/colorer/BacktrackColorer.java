@@ -29,7 +29,7 @@ public class BacktrackColorer implements GraphColorer
 
     int k = 0;
 
-    while ((k >= 0) && !isColored)
+    while ((k >= 0) && !isColored && !Thread.currentThread().isInterrupted())
     {
       while ((arr[k].Color <= 2))
       {
