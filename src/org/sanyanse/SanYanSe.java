@@ -101,7 +101,7 @@ public class SanYanSe
 
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
 
-    colorers.add(new BacktrackColorer(graph));
+//    colorers.add(new BacktrackColorer(graph));
     colorers.add(new DefaultChoiceBacktrackColorer(graph));
 //    colorers.add(new ColorChoiceBacktrackColorer(graph));
 //    colorers.add(new RandomChoiceBacktrackColorer(graph));

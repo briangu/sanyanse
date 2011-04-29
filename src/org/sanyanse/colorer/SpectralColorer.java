@@ -1,37 +1,36 @@
 package org.sanyanse.colorer;
 
 
-import org.sanyanse.common.ColorableNode;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.Graph;
-import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphDecomposition;
 
 
 public class SpectralColorer implements GraphColorer
 {
-  Graph _spec;
+  Graph _graph;
   double _p;
   double _d;
 
-  public SpectralColorer(Graph spec, double p)
+  public SpectralColorer(Graph graph, double p)
   {
-    _spec = spec;
+    _graph = graph;
     _p = p;
-    _d = p * spec.NodeCount;
+    _d = p * graph.NodeCount;
   }
 
   @Override
   public ColoringResult call()
     throws Exception
   {
-    Graph gPrime = computeGPrime(_spec);
+    Graph gPrime = _graph;
     GraphDecomposition comp = GraphDecomposition.createFrom(gPrime);
     computeSpectrum(comp);
     return null;
   }
 
+/*
   private Graph computeGPrime(Graph graph)
   {
     GraphBuilder builder = GraphBuilder.createFrom(graph);
@@ -48,6 +47,7 @@ public class SpectralColorer implements GraphColorer
 
     return gPrime;
   }
+*/
 
   public static void computeSpectrum(GraphDecomposition comp) {
 

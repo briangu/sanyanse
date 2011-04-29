@@ -1,7 +1,6 @@
 package org.sanyanse.common;
 
 
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.jblas.Eigen;
 import org.jblas.FloatMatrix;
@@ -141,19 +140,15 @@ public class GraphDecomposition
     FloatMatrix adjacency = new FloatMatrix(graph.NodeCount, graph.NodeCount);
 //    FloatMatrix degree = new FloatMatrix(graph.NodeCount, graph.NodeCount);
 
-    Map<String, GraphNodeInfo> nodeMap = graph.NodeMap;
-
     for (int i = 0; i < graph.NodeCount; i++)
     {
       ColorableNode node = graph.Nodes[i];
-      GraphNodeInfo info = graph.NodeMap.get(node.Id);
 
 //      degree.put(i, i, info.EdgeSet.size());
 
-      for (ColorableNode neighbor : info.EdgeSet)
+      for (int neighborIdx : node.Edges)
       {
-        GraphNodeInfo neighborInfo = nodeMap.get(neighbor.Id);
-        adjacency.put(i, neighborInfo.Index, info.EdgeSet.contains(neighborInfo.Node) ? 1.0f : 0.0f);
+        adjacency.put(i, neighborIdx, 1.0f);
       }
     }
 

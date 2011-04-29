@@ -4,9 +4,7 @@ package org.sanyanse.common;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import org.jblas.FloatMatrix;
 
 
@@ -15,17 +13,14 @@ public class Graph
   public final int NodeCount;
   public final double EdgeProbability;
   public final ColorableNode[] Nodes;
-  public final Map<String, GraphNodeInfo> NodeMap;
 
   public Graph(
     int nodeCnt,
     double p,
-    ColorableNode[] nodes,
-    Map<String, GraphNodeInfo> nodeMap)
+    ColorableNode[] nodes)
   {
     NodeCount = nodeCnt;
     Nodes = nodes;
-    NodeMap = nodeMap;
     EdgeProbability = p;
   }
 
@@ -41,15 +36,18 @@ public class Graph
       }
     });
 
+/*
     for (int i = 0; i < NodeCount; i++)
     {
       ColorableNode node = Nodes[i];
       NodeMap.get(node.Id).Index = i;
     }
+*/
   }
 
   public void SortByMetric(final FloatMatrix metric)
   {
+/*
     final int j = NodeCount - 1;
 
     Arrays.sort(Nodes, new Comparator<ColorableNode>()
@@ -70,50 +68,19 @@ public class Graph
       ColorableNode node = Nodes[i];
       NodeMap.get(node.Id).Index = i;
     }
+*/
   }
 
   public Graph clone()
   {
     ColorableNode[] newNodes = new ColorableNode[NodeCount];
-    Map<String, GraphNodeInfo> newNodeMap = new HashMap<String, GraphNodeInfo>(NodeCount);
 
     for (int i = 0; i < NodeCount; i++)
     {
-      GraphNodeInfo info;
-
-      if (newNodeMap.containsKey(Nodes[i].Id))
-      {
-        info = newNodeMap.get(Nodes[i].Id);
-        newNodes[i] = info.Node;
-      }
-      else
-      {
-        newNodes[i] = new ColorableNode(Nodes[i]);
-        info = new GraphNodeInfo(newNodes[i], i);
-        newNodeMap.put(newNodes[i].Id, info);
-      }
-
-      newNodes[i].Edges = new ColorableNode[Nodes[i].Edges.length];
-      for (int j = 0; j < newNodes[i].Edges.length; j++)
-      {
-        ColorableNode neighbor = Nodes[i].Edges[j];
-        GraphNodeInfo nodeEdgeNeighborInfo;
-
-        if (!newNodeMap.containsKey(neighbor.Id))
-        {
-          nodeEdgeNeighborInfo = new GraphNodeInfo(new ColorableNode(neighbor.Id), NodeMap.get(neighbor.Id).Index);
-          newNodeMap.put(neighbor.Id, nodeEdgeNeighborInfo);
-        }
-        else
-        {
-          nodeEdgeNeighborInfo = newNodeMap.get(neighbor.Id);
-        }
-
-        newNodes[i].Edges[j] = nodeEdgeNeighborInfo.Node;
-      }
+      newNodes[i] = new ColorableNode(Nodes[i]);
     }
 
-    Graph copy = new Graph(NodeCount, EdgeProbability, newNodes, newNodeMap);
+    Graph copy = new Graph(NodeCount, EdgeProbability, newNodes);
 
     return copy;
   }
@@ -159,11 +126,11 @@ public class Graph
         continue;
       }
 
-      ColorableNode[] row = Nodes[i].Edges;
+      int[] row = Nodes[i].Edges;
 
       for (int x = 0; x < row.length; x++)
       {
-        if (row[x].Color == color)
+        if (Nodes[row[x]].Color == color)
         {
           return ColorState.Invalid;
         }
@@ -191,7 +158,7 @@ public class Graph
         continue;
       }
 
-      ColorableNode[] row = Nodes[i].Edges;
+      int[] row = Nodes[i].Edges;
 
       // TODO: explore leveraging undirected nature of connection matrix
 
@@ -200,7 +167,7 @@ public class Graph
 
       for (int x = 0; x < row.length; x++)
       {
-        if (row[x].Color == color)
+        if (Nodes[row[x]].Color == color)
         {
           hasInvalidColorings = true;
           rowIsCorrectlyColored = false;

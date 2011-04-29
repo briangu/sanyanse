@@ -1,11 +1,14 @@
 package org.sanyanse.common;
 
 
+import java.util.Arrays;
+
+
 public class ColorableNode
 {
   public String Id;
   public int Color;
-  public ColorableNode[] Edges;
+  public int[] Edges;
   public int[] ColorChoices = DefaultColorChoices;
   public int ColorChoiceIndex = 0;
 
@@ -15,6 +18,9 @@ public class ColorableNode
   {
     Id = node.Id;
     Color = node.Color;
+    Edges = Arrays.copyOf(node.Edges, node.Edges.length);
+    ColorChoices = Arrays.copyOf(node.ColorChoices, node.ColorChoices.length);
+    ColorChoiceIndex = node.ColorChoiceIndex;
   }
 
   public ColorableNode(String id)
@@ -28,7 +34,7 @@ public class ColorableNode
     Color = l;
   }
 
-  public ColorableNode(String id, Integer l, ColorableNode[] edges)
+  public ColorableNode(String id, Integer l, int[] edges)
   {
     this(id);
     Color = l;

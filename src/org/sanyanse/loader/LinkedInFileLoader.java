@@ -38,12 +38,7 @@ public class LinkedInFileLoader implements GraphLoader
         String nodeId = parts[0];
         String neighborIdList = parts[1];
 
-        builder.addNode(nodeId);
-
-        for (String neighborId : neighborIdList.split(","))
-        {
-          builder.addEdge(nodeId, neighborId);
-        }
+        builder.addNode(nodeId, neighborIdList.split(","));
       }
 
       in.close();

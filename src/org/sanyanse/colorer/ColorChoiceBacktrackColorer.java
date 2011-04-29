@@ -24,12 +24,13 @@ public class ColorChoiceBacktrackColorer implements GraphColorer
     ColorableNode[] arr = _graph.Nodes;
 
     boolean isColored = false;
+    Thread cur = Thread.currentThread();
 
     int k = 0;
 
-    while ((k >= 0) && !isColored && !Thread.currentThread().isInterrupted())
+    while ((k >= 0) && !isColored && !cur.isInterrupted())
     {
-      while ((arr[k].ColorChoiceIndex <= 2))
+      while ((arr[k].ColorChoiceIndex <= 2) && !cur.isInterrupted())
       {
         arr[k].Color = arr[k].ColorChoices[arr[k].ColorChoiceIndex++];
 
