@@ -79,20 +79,38 @@ public class Graph
 
     for (int i = 0; i < NodeCount; i++)
     {
-      newNodes[i] = new ColorableNode(Nodes[i]);
-      newNodeMap.put(newNodes[i].Id, new GraphNodeInfo(newNodes[i], i));
-    }
-    for (int i = 0; i < NodeCount; i++)
-    {
-      Set<ColorableNode> newEdges = new HashSet<ColorableNode>(Nodes[i].Edges.length);
+      GraphNodeInfo info;
 
-      for (ColorableNode neighbor : Nodes[i].Edges)
+      if (newNodeMap.containsKey(Nodes[i].Id))
       {
-        newEdges.add(newNodeMap.get(neighbor.Id).Node);
+        info = newNodeMap.get(Nodes[i].Id);
+        newNodes[i] = info.Node;
+      }
+      else
+      {
+        newNodes[i] = new ColorableNode(Nodes[i]);
+        info = new GraphNodeInfo(newNodes[i], i);
+        newNodeMap.put(newNodes[i].Id, info);
       }
 
-      newNodeMap.get(newNodes[i].Id).EdgeSet = newEdges;
-      newNodes[i].Edges = newEdges.toArray(new ColorableNode[newEdges.size()]);
+      newNodes[i].Edges = new ColorableNode[Nodes[i].Edges.length];
+      for (int j = 0; j < newNodes[i].Edges.length; j++)
+      {
+        ColorableNode neighbor = Nodes[i].Edges[j];
+        GraphNodeInfo nodeEdgeNeighborInfo;
+
+        if (!newNodeMap.containsKey(neighbor.Id))
+        {
+          nodeEdgeNeighborInfo = new GraphNodeInfo(new ColorableNode(neighbor.Id), NodeMap.get(neighbor.Id).Index);
+          newNodeMap.put(neighbor.Id, nodeEdgeNeighborInfo);
+        }
+        else
+        {
+          nodeEdgeNeighborInfo = newNodeMap.get(neighbor.Id);
+        }
+
+        newNodes[i].Edges[j] = nodeEdgeNeighborInfo.Node;
+      }
     }
 
     Graph copy = new Graph(NodeCount, EdgeProbability, newNodes, newNodeMap);

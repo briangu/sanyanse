@@ -4,8 +4,12 @@ package org.sanyanse.common;
 public class ColorableNode
 {
   public String Id;
-  public Integer Color;
+  public int Color;
   public ColorableNode[] Edges;
+  public int[] ColorChoices = DefaultColorChoices;
+  public int ColorChoiceIndex = 0;
+
+  public static final int[] DefaultColorChoices = new int[] { 1, 2, 3 };
 
   public ColorableNode(ColorableNode node)
   {

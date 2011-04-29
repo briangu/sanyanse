@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import org.sanyanse.colorer.BacktrackColorer;
-import org.sanyanse.colorer.CentralityBacktrackColorer;
-import org.sanyanse.colorer.EdgeCountBacktrackColorer;
-import org.sanyanse.colorer.MultiColorer;
+
+import org.sanyanse.colorer.*;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphColorer;
@@ -104,8 +102,10 @@ public class SanYanSe
     List<GraphColorer> colorers = new ArrayList<GraphColorer>();
 
     colorers.add(new BacktrackColorer(graph));
-    colorers.add(new CentralityBacktrackColorer(graph));
-    colorers.add(new EdgeCountBacktrackColorer(graph));
+    colorers.add(new DefaultChoiceBacktrackColorer(graph));
+//    colorers.add(new ColorChoiceBacktrackColorer(graph));
+//    colorers.add(new RandomChoiceBacktrackColorer(graph));
+//    colorers.add(new EdgeCountBacktrackColorer(graph));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     colorer = MultiColorer.create(executor, colorers);
