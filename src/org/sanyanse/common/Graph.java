@@ -108,56 +108,54 @@ public class Graph
     Invalid
   }
 
+  ColorableNode[][] _cache = null;
+
   public ColorState analyzeState()
   {
+    if (_cache == null)
+    {
+      buildCache();
+    }
+
     ColorState state = ColorState.Complete;
 
-    if (Nodes == OriginalNodes)
+    for (int i = NodeCount - 1; i >= 0; i--)
     {
-      for (int i = NodeCount - 1; i >= 0; i--)
+      int color = Nodes[i].Color;
+      if (color == 0)
       {
-        int color = Nodes[i].Color;
-        if (color == 0)
-        {
-          state = ColorState.PartialValid;
-          continue;
-        }
-
-        final int[] row = Nodes[i].Edges;
-
-        for (int x = row.length - 1; x >= 0; x--)
-        {
-          if (Nodes[row[x]].Color == color)
-          {
-            return ColorState.Invalid;
-          }
-        }
+        state = ColorState.PartialValid;
+        continue;
       }
-    }
-    else
-    {
-      for (int i = NodeCount - 1; i >= 0; i--)
+
+      final ColorableNode[] edges = _cache[i];
+
+      for (int x = edges.length - 1; x >= 0; x--)
       {
-        int color = Nodes[i].Color;
-        if (color == 0)
+        if (edges[x].Color == color)
         {
-          state = ColorState.PartialValid;
-          continue;
-        }
-
-        final int[] row = Nodes[i].Edges;
-
-        for (int x = row.length - 1; x >= 0; x--)
-        {
-          if (OriginalNodes[row[x]].Color == color)
-          {
-            return ColorState.Invalid;
-          }
+          return ColorState.Invalid;
         }
       }
     }
 
     return state;
+  }
+
+  private void buildCache()
+  {
+    _cache = new ColorableNode[NodeCount][];
+    for (int i = NodeCount - 1; i >= 0; i--)
+    {
+      _cache[i] = new ColorableNode[Nodes[i].Edges.length];
+
+      final int[] row = Nodes[i].Edges;
+
+      for (int x = row.length - 1; x >= 0; x--)
+      {
+        _cache[i][x] = OriginalNodes[row[x]];
+      }
+    }
   }
 
   public GraphAnalysis analyze()
