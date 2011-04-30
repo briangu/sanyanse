@@ -78,28 +78,36 @@ public class SanYanSe
       stopWatch.start();
     }
 
-    List<GraphColorer> colorers = new ArrayList<GraphColorer>();
+    ColoringResult result;
 
-    colorers.add(new EdgeCountBacktrackColorer(graph));
-    colorers.add(new BacktrackColorer(graph));
-    colorers.add(new DefaultChoiceBacktrackColorer(graph));
-    colorers.add(new ReverseChoiceBacktrackColorer(graph));
+    if (graph.NodeCount > 0)
+    {
+      List<GraphColorer> colorers = new ArrayList<GraphColorer>();
+
+      colorers.add(new EdgeCountBacktrackColorer(graph));
+      colorers.add(new BacktrackColorer(graph));
+      colorers.add(new DefaultChoiceBacktrackColorer(graph));
+      colorers.add(new ReverseChoiceBacktrackColorer(graph));
 //    colorers.add(new ColorChoiceBacktrackColorer(graph));
 //    colorers.add(new RandomChoiceBacktrackColorer(graph));
 
+      result = processGraph(colorers);
+      if (result == null)
+      {
+        System.out.println("failed to color graph");
+        return;
+      }
 
-    ColoringResult result = processGraph(colorers);
-    if (result == null)
-    {
-      System.out.println("failed to color graph");
-      return;
+      if (_debug)
+      {
+        stopWatch.stop();
+        System.out.println(String.format("elapsed time: %s", stopWatch.getDuration()));
+        System.out.println();
+      }
     }
-
-    if (_debug)
+    else
     {
-      stopWatch.stop();
-      System.out.println(String.format("elapsed time: %s", stopWatch.getDuration()));
-      System.out.println();
+      result = ColoringResult.createNotColorableResult();
     }
 
     String outfileName = String.format("%s_%s_out", "sanyanse", graphName);
