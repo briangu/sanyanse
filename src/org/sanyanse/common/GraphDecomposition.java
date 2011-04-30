@@ -142,7 +142,7 @@ public class GraphDecomposition
 
     for (int i = 0; i < graph.NodeCount; i++)
     {
-      ColorableNode node = graph.Nodes[i];
+      Vertex node = graph.Vertices[i];
 
 //      degree.put(i, i, info.EdgeSet.size());
 

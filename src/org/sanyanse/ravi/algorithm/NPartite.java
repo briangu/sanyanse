@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.sanyanse.ravi.graph.UndirectedGraph;
-import org.sanyanse.ravi.graph.Vertex;
+import org.sanyanse.common.Vertex;
+import org.sanyanse.ravi.graph.Graph;
 import org.sanyanse.ravi.util.BaseNCounter;
 import org.sanyanse.ravi.util.LexicographicCounter;
 
@@ -21,7 +21,7 @@ public class NPartite {
 		HEURISTIC_GREEDY // O(n^2), may not be able to find a partition if one exists.
 	}
 	
-	public static Map<Vertex, Integer> partition(Algorithm algorithm, UndirectedGraph graph, int maxPartitions) {
+	public static Map<Vertex, Integer> partition(Algorithm algorithm, Graph graph, int maxPartitions) {
 		switch (algorithm) {
 			case BRUTE_FORCE_DUMB:
 				return partitionBruteForce(graph, maxPartitions);
@@ -43,7 +43,7 @@ public class NPartite {
 	 * if the given graph is n-partite. Returns null, if the given
 	 * graph is not n-partite. Run time is O(partitions^n).
 	 */
-	private static Map<Vertex, Integer> partitionBruteForce(UndirectedGraph graph, int maxPartitions) {
+	private static Map<Vertex, Integer> partitionBruteForce(Graph graph, int maxPartitions) {
 		Map<Vertex, Integer> partitionMap = null; // the output.
 
 		// Get vertices into an array, so it is easy to reference them.
@@ -96,7 +96,7 @@ public class NPartite {
 	 * graph is not n-partite. Uses lexicographic enumeration, so the
 	 * run time less than O(partitions^n) (don't know exactly what it is, yet!).
 	 */
-	private static Map<Vertex, Integer> partitionSmartBruteForce(UndirectedGraph graph, int maxPartitions) {
+	private static Map<Vertex, Integer> partitionSmartBruteForce(Graph graph, int maxPartitions) {
 		// Get vertices into an array, so it is easy to reference them.
 		int numVertices = graph.getNumVertices();
 		Vertex[] vertex = new Vertex[numVertices];
@@ -141,7 +141,7 @@ public class NPartite {
 		return null;
 	}
 	
-	private static Map<Vertex, Integer> partitionSmartBruteForce2(UndirectedGraph graph, int maxPartitions) {
+	private static Map<Vertex, Integer> partitionSmartBruteForce2(Graph graph, int maxPartitions) {
 		// Get vertices into an array, so it is easy to reference them.
 		int numVertices = graph.getNumVertices();
 		Vertex[] vertex = new Vertex[numVertices];
@@ -193,7 +193,7 @@ public class NPartite {
 		return null;
 	}
 	
-	private static Map<Vertex, Integer> partitionSmartBruteForce3(UndirectedGraph graph, int maxPartitions) {
+	private static Map<Vertex, Integer> partitionSmartBruteForce3(Graph graph, int maxPartitions) {
 		// Get vertices into an array, so it is easy to reference them.
 		int numVertices = graph.getNumVertices();
 		Vertex[] vertex = new Vertex[numVertices];
@@ -277,7 +277,7 @@ public class NPartite {
 		return null;
 	}
 	
-	private static boolean isValidColoring(UndirectedGraph graph, Vertex[] vertex, int[] coloring) {
+	private static boolean isValidColoring(Graph graph, Vertex[] vertex, int[] coloring) {
 		for (int i=0; i<coloring.length - 1; i++) {
 			for (int j=i+1; j<coloring.length; j++) {
 				if (coloring[i] == coloring[j]) {
@@ -297,7 +297,7 @@ public class NPartite {
 	 * if the given graph is n-partite. Returns null, if the given
 	 * graph doesn't seem n-partite to this greedy heuristic.
 	 */
-	private static Map<Vertex, Integer> partitionHeuristicGreedy(UndirectedGraph graph, int n) {
+	private static Map<Vertex, Integer> partitionHeuristicGreedy(Graph graph, int n) {
 		Map<Vertex, Integer> partitionMap = null;
 		if (graph != null) {
 			Set<Vertex>[] partitions = new Set[n];
@@ -305,7 +305,7 @@ public class NPartite {
 				partitions[i] = new HashSet<Vertex>();
 			}
 
-			UndirectedGraph g = graph.clone();
+			Graph g = graph.clone();
 			for (int i=0; i<n; i++) {
 				newPartition(g, partitions[i]);
 			}
@@ -327,7 +327,7 @@ public class NPartite {
 		return partitionMap;
 	}
 	
-	private static void newPartition(UndirectedGraph g, Set<Vertex> partitionVertices) {
+	private static void newPartition(Graph g, Set<Vertex> partitionVertices) {
 		Set<Vertex> notCurrentPartitionVertices = new HashSet<Vertex>();
 		for (Iterator<Vertex> vIter = g.getVertices().iterator(); vIter.hasNext(); ) {
 			Vertex vertex = vIter.next();

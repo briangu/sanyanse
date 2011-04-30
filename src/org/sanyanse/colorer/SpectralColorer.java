@@ -35,7 +35,7 @@ public class SpectralColorer implements GraphColorer
   {
     GraphBuilder builder = GraphBuilder.createFrom(graph);
 
-    for (ColorableNode node : graph.Nodes)
+    for (Vertex node : graph.Vertices)
     {
       if (node.Edges.length > (5 *_d))
       {

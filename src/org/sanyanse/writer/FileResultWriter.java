@@ -5,7 +5,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import org.sanyanse.common.ColorableNode;
+import org.sanyanse.common.Vertex;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.ColoringResultWriter;
 import org.sanyanse.common.Graph;
@@ -31,7 +31,7 @@ public class FileResultWriter implements ColoringResultWriter
       {
         Graph coloredGraph = result.Graph;
 
-        for (ColorableNode node : coloredGraph.OriginalNodes)
+        for (Vertex node : coloredGraph.OriginalVertices)
         {
           writer.write(
               String.format(

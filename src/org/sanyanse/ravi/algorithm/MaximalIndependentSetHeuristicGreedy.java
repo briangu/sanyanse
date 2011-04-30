@@ -1,8 +1,8 @@
 package org.sanyanse.ravi.algorithm;
 
-import org.sanyanse.ravi.graph.UndirectedGraph;
+import org.sanyanse.common.Vertex;
+import org.sanyanse.ravi.graph.Graph;
 import org.sanyanse.ravi.graph.Util;
-import org.sanyanse.ravi.graph.Vertex;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Set;
 
 public class MaximalIndependentSetHeuristicGreedy {
-	public static Set<Vertex> getMaximalIndependentSet(UndirectedGraph g) {
+	public static Set<Vertex> getMaximalIndependentSet(Graph g) {
 		// MIS = maximal independent set.
 		Set<Vertex> misVertices = new HashSet<Vertex>();
 		
 		// Clone the original graph since we would be modifying the graph.
-		UndirectedGraph graph = g.clone();
+		Graph graph = g.clone();
 		
 		// Order vertices by increasing order of degree. Arbitrarily break ties.
 		List<Vertex> verticesByDegree = Util.sortVerticesByDegree(graph);

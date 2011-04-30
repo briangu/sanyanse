@@ -2,7 +2,7 @@ package org.sanyanse.writer;
 
 
 import java.util.Arrays;
-import org.sanyanse.common.ColorableNode;
+import org.sanyanse.common.Vertex;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphSpecWriter;
 import org.sanyanse.common.Util;
@@ -16,7 +16,7 @@ public class StdoutGraphSpecWriter implements GraphSpecWriter
     System.out.println(String.format("nodeCnt: %s", graph.NodeCount));
 
 /*
-    Collections.sort(graphSpec.Nodes,
+    Collections.sort(graphSpec.Vertices,
                       new Comparator<String>()
                       {
                         @Override
@@ -27,7 +27,7 @@ public class StdoutGraphSpecWriter implements GraphSpecWriter
                       });
 */
 
-    for (ColorableNode node : graph.Nodes) {
+    for (Vertex node : graph.Vertices) {
       System.out.println(
           String.format(
               "%s:%s",

@@ -1,16 +1,16 @@
 package org.sanyanse.ravi.algorithm;
 
+import org.sanyanse.common.Vertex;
 import org.sanyanse.ravi.graph.DepthFirstTraversal;
-import org.sanyanse.ravi.graph.UndirectedGraph;
-import org.sanyanse.ravi.graph.Vertex;
+import org.sanyanse.ravi.graph.Graph;
 
 import java.util.Collection;
 import java.util.HashSet;
 
 public class ConnectedComponents {
-    public static Collection<UndirectedGraph> getConnectedComponents(UndirectedGraph graph) {
-    	Collection<UndirectedGraph> components = new HashSet<UndirectedGraph>();
-    	UndirectedGraph graphCopy = graph.clone();
+    public static Collection<Graph> getConnectedComponents(Graph graph) {
+    	Collection<Graph> components = new HashSet<Graph>();
+    	Graph graphCopy = graph.clone();
 
     	do {
     		DepthFirstTraversal dfs = new DepthFirstTraversal(graphCopy);
@@ -19,7 +19,7 @@ public class ConnectedComponents {
     		if ((vertices != null) && (vertices.size() > 0)) {
     			// Recreate the graph which will be returned.
     			// Create vertices first.
-    			UndirectedGraph recreatedComponent = new UndirectedGraph();
+    			Graph recreatedComponent = new Graph();
     			for (Vertex vertex : vertices) {
     				recreatedComponent.addVertex(vertex);
     			}

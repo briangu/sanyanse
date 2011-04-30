@@ -12,31 +12,31 @@ public class Graph
 {
   public final int NodeCount;
   public final double EdgeProbability;
-  public ColorableNode[] Nodes;
-  public ColorableNode[] OriginalNodes;
+  public Vertex[] Vertices;
+  public Vertex[] OriginalVertices;
 
   public Graph(
     int nodeCnt,
     double p,
-    ColorableNode[] nodes)
+    Vertex[] nodes)
   {
     NodeCount = nodeCnt;
-    Nodes = nodes;
+    Vertices = nodes;
     EdgeProbability = p;
-    OriginalNodes = nodes;
+    OriginalVertices = nodes;
   }
 
   public void SortByEdgeCount()
   {
-    Nodes = Arrays.copyOf(OriginalNodes, OriginalNodes.length);
+    Vertices = Arrays.copyOf(OriginalVertices, OriginalVertices.length);
 
-    Arrays.sort(Nodes, new Comparator<ColorableNode>()
+    Arrays.sort(Vertices, new Comparator<Vertex>()
     {
       @Override
-      public int compare(ColorableNode colorableNode, ColorableNode colorableNode1)
+      public int compare(Vertex vertex, Vertex colorableNode1)
       {
         // descending
-        return colorableNode1.Edges.length - colorableNode.Edges.length;
+        return colorableNode1.Edges.length - vertex.Edges.length;
       }
     });
   }
@@ -46,10 +46,10 @@ public class Graph
 /*
     final int j = NodeCount - 1;
 
-    Arrays.sort(Nodes, new Comparator<ColorableNode>()
+    Arrays.sort(Vertices, new Comparator<Vertex>()
     {
       @Override
-      public int compare(ColorableNode colorableNode, ColorableNode colorableNode1)
+      public int compare(Vertex colorableNode, Vertex colorableNode1)
       {
         // descending
         GraphNodeInfo infoA = NodeMap.get(colorableNode.Id);
@@ -61,7 +61,7 @@ public class Graph
 
     for (int i = 0; i < NodeCount; i++)
     {
-      ColorableNode node = Nodes[i];
+      Vertex node = Vertices[i];
       NodeMap.get(node.Id).Index = i;
     }
 */
@@ -69,11 +69,11 @@ public class Graph
 
   public Graph clone()
   {
-    ColorableNode[] newNodes = new ColorableNode[NodeCount];
+    Vertex[] newNodes = new Vertex[NodeCount];
 
     for (int i = 0; i < NodeCount; i++)
     {
-      newNodes[i] = new ColorableNode(Nodes[i]);
+      newNodes[i] = new Vertex(Vertices[i]);
     }
 
     Graph copy =
@@ -108,7 +108,7 @@ public class Graph
     Invalid
   }
 
-  ColorableNode[][] _cache = null;
+  Vertex[][] _cache = null;
 
   public ColorState analyzeState()
   {
@@ -121,14 +121,14 @@ public class Graph
 
     for (int i = NodeCount - 1; i >= 0; i--)
     {
-      int color = Nodes[i].Color;
+      int color = Vertices[i].Color;
       if (color == 0)
       {
         state = ColorState.PartialValid;
         continue;
       }
 
-      final ColorableNode[] edges = _cache[i];
+      final Vertex[] edges = _cache[i];
 
       for (int x = edges.length - 1; x >= 0; x--)
       {
@@ -144,16 +144,16 @@ public class Graph
 
   private void buildCache()
   {
-    _cache = new ColorableNode[NodeCount][];
+    _cache = new Vertex[NodeCount][];
     for (int i = NodeCount - 1; i >= 0; i--)
     {
-      _cache[i] = new ColorableNode[Nodes[i].Edges.length];
+      _cache[i] = new Vertex[Vertices[i].Edges.length];
 
-      final int[] row = Nodes[i].Edges;
+      final int[] row = Vertices[i].Edges;
 
       for (int x = row.length - 1; x >= 0; x--)
       {
-        _cache[i][x] = OriginalNodes[row[x]];
+        _cache[i][x] = OriginalVertices[row[x]];
       }
     }
   }
@@ -167,16 +167,16 @@ public class Graph
 
     ColorState state = ColorState.Complete;
 
-    for (int i = Nodes.length - 1; i >= 0; i--)
+    for (int i = Vertices.length - 1; i >= 0; i--)
     {
-      long color = Nodes[i].Color;
+      long color = Vertices[i].Color;
       if (color == 0)
       {
         state = ColorState.PartialValid;
         continue;
       }
 
-      int[] row = Nodes[i].Edges;
+      int[] row = Vertices[i].Edges;
 
       // TODO: explore leveraging undirected nature of connection matrix
 
@@ -185,7 +185,7 @@ public class Graph
 
       for (int x = 0; x < row.length; x++)
       {
-        if (OriginalNodes[row[x]].Color == color)
+        if (OriginalVertices[row[x]].Color == color)
         {
           hasInvalidColorings = true;
           rowIsCorrectlyColored = false;
@@ -197,7 +197,7 @@ public class Graph
         }
       }
 
-      edgeColoringsMap.put(Nodes[i].Id, nodeEdgeColoringCount);
+      edgeColoringsMap.put(Vertices[i].Id, nodeEdgeColoringCount);
 
       if (rowIsCorrectlyColored)
       {

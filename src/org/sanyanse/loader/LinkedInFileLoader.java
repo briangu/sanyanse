@@ -3,7 +3,7 @@ package org.sanyanse.loader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import org.sanyanse.common.ColorableNode;
+import org.sanyanse.common.Vertex;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphLoader;
@@ -26,7 +26,7 @@ public class LinkedInFileLoader implements GraphLoader
       nodeCnt = Integer.parseInt(br.readLine());
 
       if (nodeCnt == 0) {
-        return new Graph(0, 0, new ColorableNode[0]);
+        return new Graph(0, 0, new Vertex[0]);
       }
 
       builder = new GraphBuilder(nodeCnt);

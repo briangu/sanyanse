@@ -1,7 +1,7 @@
 package org.sanyanse.colorer;
 
 
-import org.sanyanse.common.ColorableNode;
+import org.sanyanse.common.Vertex;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphColorer;
@@ -23,7 +23,7 @@ public class BacktrackColorer implements GraphColorer
   @Override
   public ColoringResult call()
   {
-    ColorableNode[] arr = _graph.Nodes;
+    Vertex[] arr = _graph.Vertices;
 
     boolean isColored = false;
     Thread cur = Thread.currentThread();

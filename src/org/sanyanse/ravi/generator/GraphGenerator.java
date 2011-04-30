@@ -1,11 +1,11 @@
 package org.sanyanse.ravi.generator;
 
-import org.sanyanse.ravi.graph.UndirectedGraph;
-import org.sanyanse.ravi.graph.Vertex;
+import org.sanyanse.common.Vertex;
+import org.sanyanse.ravi.graph.Graph;
 
 public class GraphGenerator {
-	public static UndirectedGraph generateCompleteGraph(int n) {
-		UndirectedGraph graph = new UndirectedGraph();
+	public static Graph generateCompleteGraph(int n) {
+		Graph graph = new Graph();
 		Vertex[] vertices = new Vertex[n];
 		for (int i=0; i<n; i++) {
 			Vertex v = new Vertex(String.valueOf(i+1));
@@ -18,8 +18,8 @@ public class GraphGenerator {
 		return graph;
 	}
 	
-	public static UndirectedGraph generateRandomGraph(int numVertices, int numEdges) {
-		UndirectedGraph graph = new UndirectedGraph();
+	public static Graph generateRandomGraph(int numVertices, int numEdges) {
+		Graph graph = new Graph();
 		Vertex[] vertices = new Vertex[numVertices];
 		// Create vertices.
 		for (int i=0; i<numVertices; i++) {
@@ -47,7 +47,7 @@ public class GraphGenerator {
 		return graph;
 	}
 	
-	public static UndirectedGraph generateEmptyGraph(int numVertices) {
+	public static Graph generateEmptyGraph(int numVertices) {
 		return generateRandomGraph(numVertices, 0);
 	}
 }

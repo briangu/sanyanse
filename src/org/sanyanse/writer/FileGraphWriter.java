@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import org.sanyanse.common.ColorableNode;
+import org.sanyanse.common.Vertex;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphSpecWriter;
 import org.sanyanse.common.Util;
@@ -31,7 +31,7 @@ public class FileGraphWriter implements GraphSpecWriter
       writer.write(String.format("%s", graph.NodeCount));
       writer.write("\n");
 
-      for (ColorableNode node : graph.Nodes) {
+      for (Vertex node : graph.Vertices) {
         writer.write(
             String.format(
                 "%s:%s",

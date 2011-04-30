@@ -1,12 +1,15 @@
 package org.sanyanse.ravi.graph;
 
+import org.sanyanse.common.Vertex;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
-public class UndirectedGraph {
+public class Graph
+{
 	private Collection<Vertex> m_vertices = new HashSet<Vertex>();
 	private Map<Vertex, Collection<Vertex>> m_edges = new HashMap<Vertex, Collection<Vertex>>();
 	
@@ -94,8 +97,8 @@ public class UndirectedGraph {
 		return removedEdges;
 	}
 	
-	public UndirectedGraph getSubgraph(Collection<Vertex> vertices) {
-		UndirectedGraph subgraph = new UndirectedGraph();
+	public Graph getSubgraph(Collection<Vertex> vertices) {
+		Graph subgraph = new Graph();
 
 		// Add vertices.
 		for (Vertex v : vertices) {
@@ -134,8 +137,8 @@ public class UndirectedGraph {
 		return null;
 	}
 	
-	public UndirectedGraph clone() {
-		UndirectedGraph clone = new UndirectedGraph();
+	public Graph clone() {
+		Graph clone = new Graph();
 
 		// First clone all vertices. Then clone all edges.
 		for (Vertex v : m_vertices) {
