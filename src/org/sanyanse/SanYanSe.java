@@ -86,8 +86,8 @@ public class SanYanSe
 
       colorers.add(new EdgeCountBacktrackColorer(graph));
       colorers.add(new BacktrackColorer(graph));
-      colorers.add(new DefaultChoiceBacktrackColorer(graph));
-      colorers.add(new ReverseChoiceBacktrackColorer(graph));
+//      colorers.add(new DefaultChoiceBacktrackColorer(graph));
+//     colorers.add(new ReverseChoiceBacktrackColorer(graph));
 //    colorers.add(new ColorChoiceBacktrackColorer(graph));
 //    colorers.add(new RandomChoiceBacktrackColorer(graph));
 

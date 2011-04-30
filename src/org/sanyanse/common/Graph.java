@@ -85,24 +85,6 @@ public class Graph
     return copy;
   }
 
-  public Graph clone(int[] colorChoices)
-  {
-    ColorableNode[] newNodes = new ColorableNode[NodeCount];
-
-    for (int i = 0; i < NodeCount; i++)
-    {
-      newNodes[i] = new ColorableNode(Nodes[i], colorChoices);
-    }
-
-    Graph copy =
-      new Graph(
-        NodeCount,
-        EdgeProbability,
-        newNodes);
-
-    return copy;
-  }
-
   public class GraphAnalysis
   {
     public int CorrectNodeColorings;
@@ -130,22 +112,47 @@ public class Graph
   {
     ColorState state = ColorState.Complete;
 
-    for (int i = NodeCount - 1; i >= 0; i--)
+    if (Nodes == OriginalNodes)
     {
-      int color = Nodes[i].Color;
-      if (color == 0)
+      for (int i = NodeCount - 1; i >= 0; i--)
       {
-        state = ColorState.PartialValid;
-        continue;
-      }
-
-      final int[] row = Nodes[i].Edges;
-
-      for (int x = row.length - 1; x >= 0; x--)
-      {
-        if (OriginalNodes[row[x]].Color == color)
+        int color = Nodes[i].Color;
+        if (color == 0)
         {
-          return ColorState.Invalid;
+          state = ColorState.PartialValid;
+          continue;
+        }
+
+        final int[] row = Nodes[i].Edges;
+
+        for (int x = row.length - 1; x >= 0; x--)
+        {
+          if (Nodes[row[x]].Color == color)
+          {
+            return ColorState.Invalid;
+          }
+        }
+      }
+    }
+    else
+    {
+      for (int i = NodeCount - 1; i >= 0; i--)
+      {
+        int color = Nodes[i].Color;
+        if (color == 0)
+        {
+          state = ColorState.PartialValid;
+          continue;
+        }
+
+        final int[] row = Nodes[i].Edges;
+
+        for (int x = row.length - 1; x >= 0; x--)
+        {
+          if (OriginalNodes[row[x]].Color == color)
+          {
+            return ColorState.Invalid;
+          }
         }
       }
     }

@@ -76,6 +76,8 @@ public class GraphBuilder
       {
         info.Node.Edges[j++] = NodeMap.get(id).Index;
       }
+
+//      Arrays.sort(info.Node.Edges);
     }
 
     Graph graph = new Graph(NodeCount, EdgeProbability, Nodes);

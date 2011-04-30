@@ -23,11 +23,11 @@ public class ReverseChoiceBacktrackColorer implements GraphColorer
     ColoringResult result = null;
     try
     {
-      _graph = _graph.clone(colorChoices);
+      _graph = _graph.clone();
       if (Thread.currentThread().isInterrupted()) return null;
       _graph.SortByEdgeCount();
       if (Thread.currentThread().isInterrupted()) return null;
-      GraphColorer colorer = new ColorChoiceBacktrackColorer(_graph);
+      GraphColorer colorer = new ColorChoiceBacktrackColorer(_graph, colorChoices);
 
       result = colorer.call();
     }
