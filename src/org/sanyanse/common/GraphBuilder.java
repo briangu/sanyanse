@@ -47,6 +47,13 @@ public class GraphBuilder
     return addNode(nodeId, new HashSet<String>(Arrays.asList(edges)));
   }
 
+  public ColorableNode addNode(String nodeId, Set<String> edges, int color)
+  {
+    ColorableNode node = addNode(nodeId, edges);
+    node.Color = color;
+    return node;
+  }
+
   public ColorableNode addNode(String nodeId, Set<String> edges)
   {
     ColorableNode node = new ColorableNode(nodeId);

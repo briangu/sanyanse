@@ -31,7 +31,7 @@ public class FileResultWriter implements ColoringResultWriter
       {
         Graph coloredGraph = result.Graph;
 
-        for (ColorableNode node : coloredGraph.Nodes)
+        for (ColorableNode node : coloredGraph.OriginalNodes)
         {
           writer.write(
               String.format(

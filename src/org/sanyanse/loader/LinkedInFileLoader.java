@@ -2,9 +2,7 @@ package org.sanyanse.loader;
 
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.FileReader;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphBuilder;
 import org.sanyanse.common.GraphLoader;
@@ -21,9 +19,8 @@ public class LinkedInFileLoader implements GraphLoader
     GraphBuilder builder = null;
 
     try {
-      FileInputStream fstream = new FileInputStream(_filename);
-      DataInputStream in = new DataInputStream(fstream);
-      BufferedReader br = new BufferedReader(new InputStreamReader(in));
+      FileReader fstream = new FileReader(_filename);
+      BufferedReader br = new BufferedReader(fstream);
 
       nodeCnt = Integer.parseInt(br.readLine());
 
@@ -34,14 +31,10 @@ public class LinkedInFileLoader implements GraphLoader
       while ((strLine = br.readLine()) != null) {
         String[] parts = strLine.split(":");
         if (parts.length <= 1) break;
-
-        String nodeId = parts[0];
-        String neighborIdList = parts[1];
-
-        builder.addNode(nodeId, neighborIdList.split(","));
+        builder.addNode(parts[0], parts[1].split(","));
       }
 
-      in.close();
+      br.close();
     } catch (Exception e) {
       System.err.println("Error: " + e.getMessage());
     }

@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-
-import org.sanyanse.colorer.*;
+import org.sanyanse.colorer.BacktrackColorer;
+import org.sanyanse.colorer.DefaultChoiceBacktrackColorer;
+import org.sanyanse.colorer.EdgeCountBacktrackColorer;
+import org.sanyanse.colorer.MultiColorer;
+import org.sanyanse.colorer.ReverseChoiceBacktrackColorer;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphColorer;
@@ -75,7 +78,17 @@ public class SanYanSe
       stopWatch.start();
     }
 
-    ColoringResult result = processGraph(graph);
+    List<GraphColorer> colorers = new ArrayList<GraphColorer>();
+
+    colorers.add(new EdgeCountBacktrackColorer(graph));
+    colorers.add(new BacktrackColorer(graph));
+    colorers.add(new DefaultChoiceBacktrackColorer(graph));
+    colorers.add(new ReverseChoiceBacktrackColorer(graph));
+//    colorers.add(new ColorChoiceBacktrackColorer(graph));
+//    colorers.add(new RandomChoiceBacktrackColorer(graph));
+
+
+    ColoringResult result = processGraph(colorers);
     if (result == null)
     {
       System.out.println("failed to color graph");
@@ -93,19 +106,11 @@ public class SanYanSe
     FileResultWriter.create(outfileName).write(result, graph);
   }
 
-  private static ColoringResult processGraph(Graph graph)
+  private static ColoringResult processGraph(List<GraphColorer> colorers)
   {
     ColoringResult result = null;
 
     GraphColorer colorer;
-
-    List<GraphColorer> colorers = new ArrayList<GraphColorer>();
-
-//    colorers.add(new BacktrackColorer(graph));
-    colorers.add(new DefaultChoiceBacktrackColorer(graph));
-//    colorers.add(new ColorChoiceBacktrackColorer(graph));
-//    colorers.add(new RandomChoiceBacktrackColorer(graph));
-//    colorers.add(new EdgeCountBacktrackColorer(graph));
 
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     colorer = MultiColorer.create(executor, colorers);

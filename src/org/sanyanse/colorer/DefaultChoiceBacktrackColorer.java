@@ -23,6 +23,8 @@ public class DefaultChoiceBacktrackColorer implements GraphColorer
     {
       _graph = _graph.clone();
       if (Thread.currentThread().isInterrupted()) return null;
+      _graph.SortByEdgeCount();
+      if (Thread.currentThread().isInterrupted()) return null;
       GraphColorer colorer = new ColorChoiceBacktrackColorer(_graph);
 
       result = colorer.call();

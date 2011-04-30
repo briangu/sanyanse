@@ -12,7 +12,8 @@ public class Graph
 {
   public final int NodeCount;
   public final double EdgeProbability;
-  public final ColorableNode[] Nodes;
+  public ColorableNode[] Nodes;
+  public ColorableNode[] OriginalNodes;
 
   public Graph(
     int nodeCnt,
@@ -22,10 +23,13 @@ public class Graph
     NodeCount = nodeCnt;
     Nodes = nodes;
     EdgeProbability = p;
+    OriginalNodes = nodes;
   }
 
   public void SortByEdgeCount()
   {
+    Nodes = Arrays.copyOf(OriginalNodes, OriginalNodes.length);
+
     Arrays.sort(Nodes, new Comparator<ColorableNode>()
     {
       @Override
@@ -35,14 +39,6 @@ public class Graph
         return colorableNode1.Edges.length - colorableNode.Edges.length;
       }
     });
-
-/*
-    for (int i = 0; i < NodeCount; i++)
-    {
-      ColorableNode node = Nodes[i];
-      NodeMap.get(node.Id).Index = i;
-    }
-*/
   }
 
   public void SortByMetric(final FloatMatrix metric)
@@ -80,7 +76,29 @@ public class Graph
       newNodes[i] = new ColorableNode(Nodes[i]);
     }
 
-    Graph copy = new Graph(NodeCount, EdgeProbability, newNodes);
+    Graph copy =
+      new Graph(
+        NodeCount,
+        EdgeProbability,
+        newNodes);
+
+    return copy;
+  }
+
+  public Graph clone(int[] colorChoices)
+  {
+    ColorableNode[] newNodes = new ColorableNode[NodeCount];
+
+    for (int i = 0; i < NodeCount; i++)
+    {
+      newNodes[i] = new ColorableNode(Nodes[i], colorChoices);
+    }
+
+    Graph copy =
+      new Graph(
+        NodeCount,
+        EdgeProbability,
+        newNodes);
 
     return copy;
   }
@@ -98,11 +116,6 @@ public class Graph
       CorrectEdgeColorings = correctEdgeColorings;
       CorrectNodeColorings = correctNodeColorings;
       EdgeColoringsMap = edgeColoringsMap;
-    }
-
-    public Boolean IsColored()
-    {
-      return State == ColorState.Complete;
     }
   }
 
@@ -126,11 +139,11 @@ public class Graph
         continue;
       }
 
-      int[] row = Nodes[i].Edges;
+      final int[] row = Nodes[i].Edges;
 
-      for (int x = 0; x < row.length; x++)
+      for (int x = row.length - 1; x >= 0; x--)
       {
-        if (Nodes[row[x]].Color == color)
+        if (OriginalNodes[row[x]].Color == color)
         {
           return ColorState.Invalid;
         }
@@ -167,7 +180,7 @@ public class Graph
 
       for (int x = 0; x < row.length; x++)
       {
-        if (Nodes[row[x]].Color == color)
+        if (OriginalNodes[row[x]].Color == color)
         {
           hasInvalidColorings = true;
           rowIsCorrectlyColored = false;

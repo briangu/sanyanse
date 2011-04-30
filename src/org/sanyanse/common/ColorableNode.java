@@ -23,6 +23,12 @@ public class ColorableNode
     ColorChoiceIndex = node.ColorChoiceIndex;
   }
 
+  public ColorableNode(ColorableNode node, int[] colorChoices)
+  {
+    this(node);
+    ColorChoices = colorChoices;
+  }
+
   public ColorableNode(String id)
   {
     this(id, 0);
@@ -32,13 +38,6 @@ public class ColorableNode
   {
     Id = id;
     Color = l;
-  }
-
-  public ColorableNode(String id, Integer l, int[] edges)
-  {
-    this(id);
-    Color = l;
-    Edges = edges;
   }
 
   public boolean equals(Object o)

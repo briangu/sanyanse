@@ -6,11 +6,11 @@ import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphColorer;
 
 
-public class EdgeCountBacktrackColorer implements GraphColorer
+public class ReverseChoiceBacktrackColorer implements GraphColorer
 {
   Graph _graph;
 
-  public EdgeCountBacktrackColorer(Graph graph)
+  public ReverseChoiceBacktrackColorer(Graph graph)
   {
     _graph = graph;
   }
@@ -18,14 +18,16 @@ public class EdgeCountBacktrackColorer implements GraphColorer
   @Override
   public ColoringResult call()
   {
+    final int[] colorChoices = new int[] {3, 2, 1};
+
     ColoringResult result = null;
     try
     {
-      _graph = _graph.clone();
+      _graph = _graph.clone(colorChoices);
       if (Thread.currentThread().isInterrupted()) return null;
       _graph.SortByEdgeCount();
       if (Thread.currentThread().isInterrupted()) return null;
-      GraphColorer colorer = new BacktrackColorer(_graph);
+      GraphColorer colorer = new ColorChoiceBacktrackColorer(_graph);
 
       result = colorer.call();
     }
@@ -34,7 +36,7 @@ public class EdgeCountBacktrackColorer implements GraphColorer
       e.printStackTrace();
     }
 
-    System.out.println("ec finished");
+    System.out.println("dcbt finished");
 
     return result;
   }
