@@ -36,7 +36,7 @@ Issues are tracked at:
 ### Getting Started
 
 1. Compile
-2. java -jar sanyanse.org org.sanyanse.SanYanSe <3 coloring file>
+2. java -jar sanyanse.jar org.sanyanse.SanYanSe <3 coloring file>
 
 See test folder for many coloring files.
 
