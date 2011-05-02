@@ -2,7 +2,7 @@ package org.sanyanse.ravi.algorithm;
 
 
 import org.sanyanse.common.Vertex;
-import org.sanyanse.ravi.graph.Graph;
+import org.sanyanse.ravi.graph.UndirectedGraph;
 import org.sanyanse.ravi.graph.Tree;
 import org.sanyanse.ravi.graph.TreeNode;
 import org.sanyanse.ravi.util.LexicographicSelector;
@@ -30,10 +30,10 @@ public class Tripartite {
 	 * 3. Reconcile partitions, since only cut vertices can be shared
 	 *    between any two biconnected components.
 	 */
-	public static Map<Vertex, Integer> partition(Algorithm algorithm, Graph graph) {
+	public static Map<Vertex, Integer> partition(Algorithm algorithm, UndirectedGraph graph) {
 		Map<Vertex, Integer> partition = new HashMap<Vertex, Integer>();
-		Collection<Graph> disconnectedComponents = ConnectedComponents.getConnectedComponents(graph);
-		for (Graph component : disconnectedComponents) {
+		Collection<UndirectedGraph> disconnectedComponents = ConnectedComponents.getConnectedComponents(graph);
+		for (UndirectedGraph component : disconnectedComponents) {
 			Map<Vertex, Integer> componentPartition = getPartitionsForConnectedComponent(algorithm, component);
 			if (componentPartition == null) {
 				// Component could not be 3-partitioned.
@@ -45,16 +45,16 @@ public class Tripartite {
 	}
 	
 	// Input graph is assumed to be connected.
-	private static Map<Vertex, Integer> getPartitionsForConnectedComponent(Algorithm algorithm, Graph graph) {
+	private static Map<Vertex, Integer> getPartitionsForConnectedComponent(Algorithm algorithm, UndirectedGraph graph) {
 		// 1. Decompose given graph into biconnected components.
 		BiconnectedComponents bic = new BiconnectedComponents(graph);
 		Collection<Vertex> cutVertices = bic.getCutVertices();
-		Collection<Graph> graphs = bic.getComponents();
+		Collection<UndirectedGraph> graphs = bic.getComponents();
 		
 		// 2. Solve 3-partite problem in the tree order of biconnected components.
 		// 3. Reconcile partitions in that order as well.
 		Tree biconnectedComponentTree = bic.getBiconnectedComponentTree();
-		Map<TreeNode, Graph> treeToBiconnectedComponentMap = bic.getTreeNodeToComponentsMap();
+		Map<TreeNode, UndirectedGraph> treeToBiconnectedComponentMap = bic.getTreeNodeToComponentsMap();
 		Map<Vertex, Integer> reconciledPartitions = new HashMap<Vertex, Integer>(); // holder for reconciled partitions.
 
 		// Initialize our queue with the root node.
@@ -63,7 +63,7 @@ public class Tripartite {
 
 		while (queue.size() > 0) {
 			TreeNode node = queue.remove();
-			Graph biconnectedGraph = treeToBiconnectedComponentMap.get(node);
+			UndirectedGraph biconnectedGraph = treeToBiconnectedComponentMap.get(node);
 			Map<Vertex, Integer> partition = getPartitionsForBiconnectedGraph(algorithm, biconnectedGraph);
 			if (partition != null) {
 				reconcilePartitions(reconciledPartitions, partition);
@@ -87,7 +87,7 @@ public class Tripartite {
 	 * (2) If we cannot find appropriate partition, try to find a 4-clique. - O(V^4).
 	 * (3) If we cannot find a clique, run exhaustive algorithm, currently O(3^n).
 	 */
-	private static Map<Vertex, Integer> getPartitionsForBiconnectedGraph(Algorithm algorithm, Graph graph) {
+	private static Map<Vertex, Integer> getPartitionsForBiconnectedGraph(Algorithm algorithm, UndirectedGraph graph) {
 		// Heuristic greedy algorithm is O(V+E).
 		Map<Vertex, Integer> partitions = NPartite.partition(NPartite.Algorithm.HEURISTIC_GREEDY, graph, 3);
 		if (partitions == null) {
@@ -159,10 +159,10 @@ public class Tripartite {
 	}
 
 	// TODO: remove input parameter divBy
-	private static Map<Vertex, Integer> partitionMIS(Graph graph, int divBy) {
-		//Vertex[] vertices = getAsArray(graph.getVertices());
+	private static Map<Vertex, Integer> partitionMIS(UndirectedGraph graph, int divBy) {
+		//Vertex[] vertices = getAsArray(graph.cloneVertices());
 		Vertex[] vertices = new Vertex[graph.getNumVertices()];
-		graph.getVertices().toArray(vertices);
+		graph.cloneVertices().toArray(vertices);
 
 		int numVertices = vertices.length;
 		int misSize = (int) Math.floor(numVertices * 1.0F / divBy);
@@ -175,7 +175,7 @@ public class Tripartite {
 		// Data structures for optimization - reuse cloned graph instead of recreating new clones for each iteration.
 		// Just delete vertices/edges not required and re-add them at the end of the iteration. O(n^2) savings each time.
 		Map<Vertex, Collection<Vertex>> deletedEdges = new HashMap<Vertex, Collection<Vertex>>();
-		Graph graphClone = graph.clone();
+		UndirectedGraph graphClone = graph.clone();
 		
 		while (selector.hasNext()) {
 			// Get non-essential stuff out of the way.
@@ -276,7 +276,7 @@ public class Tripartite {
 		return vertex;
 	}
 	
-	private static boolean isIndependentSet(Graph graph, Vertex[] vertices, boolean[] candidate) {
+	private static boolean isIndependentSet(UndirectedGraph graph, Vertex[] vertices, boolean[] candidate) {
 		if ((vertices != null) && (graph != null)) {
 			for (int i=0; i<vertices.length - 1; i++) {
 				if (candidate[i]) {

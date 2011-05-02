@@ -1,7 +1,7 @@
 package org.sanyanse.ravi.algorithm;
 
 import org.sanyanse.common.Vertex;
-import org.sanyanse.ravi.graph.Graph;
+import org.sanyanse.ravi.graph.UndirectedGraph;
 import org.sanyanse.ravi.graph.Tree;
 import org.sanyanse.ravi.graph.TreeNode;
 
@@ -23,7 +23,7 @@ public class CutVertex {
 	private Map<TreeNode, Integer> m_endTimeMap = new HashMap<TreeNode, Integer>();
 	private Map<TreeNode, Integer> m_lowTimeMap = new HashMap<TreeNode, Integer>();
 	
-	public Collection<Vertex>  getCutVertices(Graph graph) {
+	public Collection<Vertex>  getCutVertices(UndirectedGraph graph) {
 		Collection<Vertex> cutVertices = new HashSet<Vertex>();
 		Vertex root = graph.getRandomVertex();
 		//System.out.println("Root: " + root.getName());
@@ -33,7 +33,7 @@ public class CutVertex {
 		return cutVertices;
 	}
 	
-	private void dfs(Graph graph, Vertex v, TreeNode parent, Collection<Vertex> cutVertices) {
+	private void dfs(UndirectedGraph graph, Vertex v, TreeNode parent, Collection<Vertex> cutVertices) {
 		if (!m_seen.contains(v)) {
 			m_seen.add(v);			
 			TreeNode node = new TreeNode(v.Id, parent);

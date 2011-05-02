@@ -8,10 +8,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
-public class Graph
+public class UndirectedGraph
 {
 	private Collection<Vertex> m_vertices = new HashSet<Vertex>();
-	private Map<Vertex, Collection<Vertex>> m_edges = new HashMap<Vertex, Collection<Vertex>>();
+	private Map<String, Collection<Vertex>> m_edges = new HashMap<String, Collection<Vertex>>();
 	
 	public void addVertex(Vertex v) {
 		m_vertices.add(v);
@@ -22,27 +22,25 @@ public class Graph
 		addSingleEdge(v2, v1);
 	}
 	
-	private void addSingleEdge(Vertex v1, Vertex v2) {
-		if (!hasEdge(v1, v2)) {
-			Collection<Vertex> edges = getEdges(v1);
-			if (edges == null) {
-				edges = new HashSet<Vertex>();
-				m_edges.put(v1, edges);
-			}
-			edges.add(v2);
-		}
+	public void addSingleEdge(Vertex v1, Vertex v2) {
+    Collection<Vertex> edges = getEdges(v1);
+    if (edges == null) {
+      edges = new HashSet<Vertex>();
+      m_edges.put(v1.Id, edges);
+    }
+    edges.add(v2);
 	}
 
 	public boolean hasEdge(Vertex v1, Vertex v2) {
-		boolean hasEdge = false;
-		Collection<Vertex> edges = getEdges(v1);
-		if (edges != null) {
-			hasEdge = edges.contains(v2);
-		}
-		return hasEdge;
+    Collection<Vertex> edges = m_edges.get(v1.Id);
+    return edges == null ? false : edges.contains(v2);
 	}
-	
-	public Collection<Vertex> getVertices() {
+
+  public Collection<Vertex> getVertices() {
+    return m_vertices;
+  }
+
+	public Collection<Vertex> cloneVertices() {
 		// Create a new copy of the collection.
 		Collection<Vertex> copy = null;
 		if (m_vertices != null) {
@@ -57,7 +55,7 @@ public class Graph
 	}
 	
 	public Collection<Vertex> getEdges(Vertex v) {
-		return m_edges.get(v);
+		return m_edges.get(v.Id);
 	}
 	
 	public int getDegree(Vertex v) {
@@ -97,8 +95,8 @@ public class Graph
 		return removedEdges;
 	}
 	
-	public Graph getSubgraph(Collection<Vertex> vertices) {
-		Graph subgraph = new Graph();
+	public UndirectedGraph getSubgraph(Collection<Vertex> vertices) {
+		UndirectedGraph subgraph = new UndirectedGraph();
 
 		// Add vertices.
 		for (Vertex v : vertices) {
@@ -137,8 +135,8 @@ public class Graph
 		return null;
 	}
 	
-	public Graph clone() {
-		Graph clone = new Graph();
+	public UndirectedGraph clone() {
+		UndirectedGraph clone = new UndirectedGraph();
 
 		// First clone all vertices. Then clone all edges.
 		for (Vertex v : m_vertices) {

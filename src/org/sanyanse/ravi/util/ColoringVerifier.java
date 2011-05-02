@@ -2,15 +2,15 @@ package org.sanyanse.ravi.util;
 
 
 import org.sanyanse.common.Vertex;
-import org.sanyanse.ravi.graph.Graph;
+import org.sanyanse.ravi.graph.UndirectedGraph;
 
 import java.util.Collection;
 import java.util.Map;
 
 public class ColoringVerifier {
-	public static boolean isValid(Graph graph, Map<Vertex, Integer> coloring) {
+	public static boolean isValid(UndirectedGraph graph, Map<Vertex, Integer> coloring) {
 		if (coloring != null) {
-			Collection<Vertex> vertices = graph.getVertices();
+			Collection<Vertex> vertices = graph.cloneVertices();
 
 			// Make sure that each vertex has been allocated some color.
 			for (Vertex vertex : vertices) {

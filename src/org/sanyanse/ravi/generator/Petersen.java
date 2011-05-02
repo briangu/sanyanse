@@ -1,12 +1,12 @@
 package org.sanyanse.ravi.generator;
 
 import org.sanyanse.common.Vertex;
-import org.sanyanse.ravi.graph.Graph;
+import org.sanyanse.ravi.graph.UndirectedGraph;
 
 public class Petersen {
 	// TODO: see and implement "Generalized Petersen graph".
-	public static Graph get() {
-		Graph graph = new Graph();
+	public static UndirectedGraph get() {
+		UndirectedGraph graph = new UndirectedGraph();
 		Vertex v1 = new Vertex("v1");
 		Vertex v2 = new Vertex("v2");
 		Vertex v3 = new Vertex("v3");

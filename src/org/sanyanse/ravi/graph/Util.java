@@ -11,10 +11,10 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Util {
-	public static Collection<Graph> getConnectedComponents(Graph graph) {
-		Collection<Graph> subgraphs = new HashSet<Graph>();
+	public static Collection<UndirectedGraph> getConnectedComponents(UndirectedGraph graph) {
+		Collection<UndirectedGraph> subgraphs = new HashSet<UndirectedGraph>();
 		
-		Collection<Vertex> vertices = graph.getVertices();
+		Collection<Vertex> vertices = graph.cloneVertices();
 		while (vertices.size() > 0) {
 			Vertex root = null;
 			{
@@ -26,7 +26,7 @@ public class Util {
 			dfs(graph, root, reachableVertices);
 			
 			// Get induced subgraph for the reachable vertices.
-			Graph subgraph = graph.getSubgraph(reachableVertices);
+			UndirectedGraph subgraph = graph.getSubgraph(reachableVertices);
 			subgraphs.add(subgraph);
 
 			// Remove reachable vertices and proceed with only unreachable vertices.
@@ -38,11 +38,11 @@ public class Util {
 		return subgraphs;
 	}
 
-	private static Tree dfs(Graph graph, Vertex root, Collection<Vertex> traversedVertices) {
+	private static Tree dfs(UndirectedGraph graph, Vertex root, Collection<Vertex> traversedVertices) {
 		return dfs(graph, root, null, traversedVertices, null);
 	}
 	
-	private static Tree dfs(Graph graph, Vertex v, TreeNode parent, Collection<Vertex> seenVertices, Tree dfsTree) {
+	private static Tree dfs(UndirectedGraph graph, Vertex v, TreeNode parent, Collection<Vertex> seenVertices, Tree dfsTree) {
 		if (seenVertices == null) {
 			seenVertices = new HashSet<Vertex>();
 		}
@@ -64,8 +64,8 @@ public class Util {
 		return dfsTree;
 	}
 
-	public static List<Vertex> sortVerticesByDegree(final Graph graph) {
-		Collection<Vertex> vertices = graph.getVertices();
+	public static List<Vertex> sortVerticesByDegree(final UndirectedGraph graph) {
+		Collection<Vertex> vertices = graph.cloneVertices();
 		List<Vertex> list = new ArrayList<Vertex>(vertices);
 		Collections.sort(list, new Comparator<Vertex>() {
 			public int compare(Vertex v1, Vertex v2) {

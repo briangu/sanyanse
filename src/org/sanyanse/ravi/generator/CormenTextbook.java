@@ -1,7 +1,7 @@
 package org.sanyanse.ravi.generator;
 
 import org.sanyanse.common.Vertex;
-import org.sanyanse.ravi.graph.Graph;
+import org.sanyanse.ravi.graph.UndirectedGraph;
 
 /**
  * Graphs from the textbook "Introduction to Algorithms",
@@ -9,7 +9,7 @@ import org.sanyanse.ravi.graph.Graph;
  */
 public class CormenTextbook {
 	// Graph from Figure 23.10
-	public static Graph create_figure_23_10() {
+	public static UndirectedGraph create_figure_23_10() {
 		Vertex v1 = new Vertex("v1");
 		Vertex v2 = new Vertex("v2");
 		Vertex v3 = new Vertex("v3");
@@ -34,7 +34,7 @@ public class CormenTextbook {
 		Vertex v22 = new Vertex("v22");
 		Vertex v23 = new Vertex("v23");
 		
-		Graph graph = new Graph();
+		UndirectedGraph graph = new UndirectedGraph();
 		graph.addVertex(v1);
 		graph.addVertex(v2);
 		graph.addVertex(v3);
@@ -97,7 +97,7 @@ public class CormenTextbook {
 	}
 	
 	// Graph from Figure 23.10
-	public static Graph create_figure_23_10_modified_3colorable() {
+	public static UndirectedGraph create_figure_23_10_modified_3colorable() {
 		Vertex v1 = new Vertex("v1");
 		Vertex v2 = new Vertex("v2");
 		Vertex v3 = new Vertex("v3");
@@ -122,7 +122,7 @@ public class CormenTextbook {
 		Vertex v22 = new Vertex("v22");
 		Vertex v23 = new Vertex("v23");
 		
-		Graph graph = new Graph();
+		UndirectedGraph graph = new UndirectedGraph();
 		graph.addVertex(v1);
 		graph.addVertex(v2);
 		graph.addVertex(v3);

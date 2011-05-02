@@ -1,7 +1,7 @@
 package org.sanyanse.ravi.algorithm;
 
 import org.sanyanse.common.Vertex;
-import org.sanyanse.ravi.graph.Graph;
+import org.sanyanse.ravi.graph.UndirectedGraph;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,9 +12,9 @@ public class Bipartite {
 	/**
 	 * Non-null return value implies a valid partition.
 	 */
-    public static Map<Vertex, Integer> partition(Graph graph) {
+    public static Map<Vertex, Integer> partition(UndirectedGraph graph) {
     	Map<Vertex, Integer> colorAssignments = new HashMap<Vertex, Integer>();
-    	Collection<Vertex> vertices = graph.getVertices();
+    	Collection<Vertex> vertices = graph.cloneVertices();
 
     	for (Iterator<Vertex> vIter = vertices.iterator(); vIter.hasNext(); ) {
 			Vertex vertex = vIter.next();
@@ -37,7 +37,7 @@ public class Bipartite {
     }
     
     // Implements a DFS algorithm.
-	private static boolean is2Colorable(Graph graph, Vertex vertex,
+	private static boolean is2Colorable(UndirectedGraph graph, Vertex vertex,
 			Vertex parent, Integer proposedColor,
 			Map<Vertex, Integer> colorAssignments) {
     	Collection<Vertex> adjacentVertices = graph.getEdges(vertex);

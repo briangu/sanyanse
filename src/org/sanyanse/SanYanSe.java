@@ -7,17 +7,15 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import org.sanyanse.colorer.BacktrackColorer;
-import org.sanyanse.colorer.DefaultChoiceBacktrackColorer;
-import org.sanyanse.colorer.EdgeCountBacktrackColorer;
-import org.sanyanse.colorer.MultiColorer;
-import org.sanyanse.colorer.ReverseChoiceBacktrackColorer;
+
+import org.sanyanse.colorer.*;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphColorer;
 import org.sanyanse.common.GraphLoader;
 import org.sanyanse.common.StopWatch;
 import org.sanyanse.loader.LinkedInFileLoader;
+import org.sanyanse.ravi.algorithm.Tripartite;
 import org.sanyanse.writer.FileResultWriter;
 import org.sanyanse.writer.StdoutGraphSpecWriter;
 
@@ -84,8 +82,9 @@ public class SanYanSe
     {
       List<GraphColorer> colorers = new ArrayList<GraphColorer>();
 
-      colorers.add(new EdgeCountBacktrackColorer(graph));
-      colorers.add(new BacktrackColorer(graph));
+      colorers.add(new RaviTripartiteColorer(graph, Tripartite.Algorithm.BRUTE_FORCE_LEXICOGRAPHIC_ENUMERATION));
+//      colorers.add(new EdgeCountBacktrackColorer(graph));
+//      colorers.add(new BacktrackColorer(graph));
 //      colorers.add(new DefaultChoiceBacktrackColorer(graph));
 //     colorers.add(new ReverseChoiceBacktrackColorer(graph));
 //    colorers.add(new ColorChoiceBacktrackColorer(graph));

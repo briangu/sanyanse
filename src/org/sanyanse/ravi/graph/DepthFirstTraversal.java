@@ -8,12 +8,12 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class DepthFirstTraversal {
-	private Graph _graph;
+	private UndirectedGraph _graph;
 	private Collection<Vertex> m_seen = new HashSet<Vertex>();
 	private Tree m_tree = null;
 	private Map<TreeNode, Vertex> m_treeToGraphMap = new HashMap<TreeNode, Vertex>();
 	
-	public DepthFirstTraversal(Graph graph) {
+	public DepthFirstTraversal(UndirectedGraph graph) {
 		_graph = graph;
 	}
 	
@@ -29,7 +29,7 @@ public class DepthFirstTraversal {
 		return m_tree;
 	}
 	
-	private void dfs(Graph graph, Vertex v, TreeNode parent) {
+	private void dfs(UndirectedGraph graph, Vertex v, TreeNode parent) {
 		if (!m_seen.contains(v)) {
 			m_seen.add(v);			
 			TreeNode node = new TreeNode(v.Id, parent);
