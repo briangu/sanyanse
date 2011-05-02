@@ -5,12 +5,10 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
-
-import org.sanyanse.common.Vertex;
 import org.sanyanse.common.ColoringResult;
 import org.sanyanse.common.ColoringResultWriter;
 import org.sanyanse.common.Graph;
+import org.sanyanse.common.Vertex;
 
 
 public class FileResultWriter implements ColoringResultWriter
@@ -31,31 +29,15 @@ public class FileResultWriter implements ColoringResultWriter
 
       if (result.IsColored)
       {
-        if (result.Graph != null)
-        {
-          Graph coloredGraph = result.Graph;
+        Graph coloredGraph = result.Graph;
 
-          for (Vertex node : coloredGraph.OriginalVertices)
-          {
-            writer.write(
-                String.format(
-                    "%s:%s\n",
-                    node.Id,
-                    node.Color));
-          }
-        }
-        else
+        for (Vertex node : coloredGraph.OriginalVertices)
         {
-          Map<Vertex, Integer> coloredMap = result.ColorMap;
-
-          for (Vertex node : origGraph.OriginalVertices)
-          {
-            writer.write(
-                String.format(
-                    "%s:%s\n",
-                    node.Id,
-                    coloredMap.get(node) + 1));
-          }
+          writer.write(
+              String.format(
+                  "%s:%s\n",
+                  node.Id,
+                  node.Color));
         }
       }
 

@@ -1,3 +1,9 @@
+/**
+ * SanYanSe
+ *
+ * @Author Brian Guarraci
+ *
+ */
 package org.sanyanse.colorer;
 
 
@@ -33,8 +39,6 @@ public class EdgeCountBacktrackColorer implements GraphColorer
     {
       e.printStackTrace();
     }
-
-    System.out.println("ec finished");
 
     return result;
   }

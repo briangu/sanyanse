@@ -1,3 +1,9 @@
+/**
+ * SanYanSe
+ *
+ * @Author Brian Guarraci
+ *
+ */
 package org.sanyanse.colorer;
 
 
@@ -63,8 +69,6 @@ public class BacktrackColorer implements GraphColorer
         isColored
         ? ColoringResult.createColoredGraphResult(_graph)
         : ColoringResult.createNotColorableResult();
-
-    System.out.println("bt finished");
 
     return result;
   }
