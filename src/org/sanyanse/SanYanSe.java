@@ -82,13 +82,16 @@ public class SanYanSe
     {
       List<GraphColorer> colorers = new ArrayList<GraphColorer>();
 
-      colorers.add(new RaviTripartiteColorer(graph, Tripartite.Algorithm.BRUTE_FORCE_LEXICOGRAPHIC_ENUMERATION));
-//      colorers.add(new EdgeCountBacktrackColorer(graph));
-//      colorers.add(new BacktrackColorer(graph));
+//      colorers.add(new RaviTripartiteColorer(graph, Tripartite.Algorithm.BRUTE_FORCE_LEXICOGRAPHIC_ENUMERATION));
+      colorers.add(new EdgeCountBacktrackColorer(graph));
+      colorers.add(new BacktrackColorer(graph));
 //      colorers.add(new DefaultChoiceBacktrackColorer(graph));
 //     colorers.add(new ReverseChoiceBacktrackColorer(graph));
 //    colorers.add(new ColorChoiceBacktrackColorer(graph));
-//    colorers.add(new RandomChoiceBacktrackColorer(graph));
+      colorers.add(new RandomChoiceBacktrackColorer(graph));
+      colorers.add(new RandomChoiceBacktrackColorer(graph));
+      colorers.add(new RandomChoiceBacktrackColorer(graph));
+      colorers.add(new RandomChoiceBacktrackColorer(graph));
 
       result = processGraph(colorers);
       if (result == null)

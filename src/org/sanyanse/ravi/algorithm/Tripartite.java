@@ -94,7 +94,7 @@ public class Tripartite {
 			// Our simplifed algorithm could not partition graph into 3 parts.
 			// Determine if there is a 4-clique. If there is, we know we don't have
 			// a 3-partite graph.
-			if (NCliqueBruteForce.getClique(graph, 4) == null) {
+//**			if (NCliqueBruteForce.getClique(graph, 4) == null) {
 				//System.out.println("No 4-clique found.");
 				// We couldn't find a 4-clique. We will do an exhaustive search.
 				// This is O(3^n), hooray!
@@ -121,7 +121,7 @@ public class Tripartite {
 					default:
 						throw new IllegalArgumentException("Unknown/unhandled algorithm");
 				}
-			}
+//**			}
 		}
 		return partitions;
 	}
@@ -244,7 +244,7 @@ public class Tripartite {
 							for (Vertex adjacentVertex : deletedEdges.remove(v)) {
 								graphClone.addEdge(v, adjacentVertex);
 							}
-						}
+  						}
 					}
 					vertexNumber++;
 				}

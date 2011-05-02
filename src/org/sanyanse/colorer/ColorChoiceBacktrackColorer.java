@@ -12,16 +12,9 @@ import static org.sanyanse.common.Graph.ColorState.*;
 public class ColorChoiceBacktrackColorer implements GraphColorer
 {
   Graph _graph;
-  int[] _colorChoices;
+  int[][] _colorChoices;
 
-  final static int[] defaultColrChoices = new int[] { 1, 2, 3 };
-
-  public ColorChoiceBacktrackColorer(Graph graph)
-  {
-    this(graph, defaultColrChoices);
-  }
-
-  public ColorChoiceBacktrackColorer(Graph graph, int[] colorChoices)
+  public ColorChoiceBacktrackColorer(Graph graph, int[][] colorChoices)
   {
     _graph = graph;
     _colorChoices = colorChoices;
@@ -42,7 +35,7 @@ public class ColorChoiceBacktrackColorer implements GraphColorer
     {
       while ((cci[k] <= 2) && !cur.isInterrupted())
       {
-        arr[k].Color = _colorChoices[cci[k]++];
+        arr[k].Color = _colorChoices[k][cci[k]++];
 
         Graph.ColorState state = _graph.analyzeState();
         if (state == Invalid)

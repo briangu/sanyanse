@@ -15,11 +15,20 @@ public class ReverseChoiceBacktrackColorer implements GraphColorer
     _graph = graph;
   }
 
+  private int[][] buildColorChoices()
+  {
+    int[][] colorChoices = new int[_graph.NodeCount][];
+    int[] defaultColors = new int[] { 3, 2, 1 };
+    for (int i = 0; i < _graph.NodeCount; i++)
+    {
+      colorChoices[i] = defaultColors;
+    }
+    return colorChoices;
+  }
+
   @Override
   public ColoringResult call()
   {
-    final int[] colorChoices = new int[] {3, 2, 1};
-
     ColoringResult result = null;
     try
     {
@@ -27,7 +36,7 @@ public class ReverseChoiceBacktrackColorer implements GraphColorer
       if (Thread.currentThread().isInterrupted()) return null;
       _graph.SortByEdgeCount();
       if (Thread.currentThread().isInterrupted()) return null;
-      GraphColorer colorer = new ColorChoiceBacktrackColorer(_graph, colorChoices);
+      GraphColorer colorer = new ColorChoiceBacktrackColorer(_graph, buildColorChoices());
 
       result = colorer.call();
     }
@@ -36,7 +45,7 @@ public class ReverseChoiceBacktrackColorer implements GraphColorer
       e.printStackTrace();
     }
 
-    System.out.println("dcbt finished");
+    System.out.println("rec finished");
 
     return result;
   }

@@ -276,21 +276,21 @@ public class NPartite {
 		System.out.println("iterations: " + numIterations + " ");
 		return null;
 	}
-	
-	private static boolean isValidColoring(UndirectedGraph graph, Vertex[] vertex, int[] coloring) {
-		for (int i=0; i<coloring.length - 1; i++) {
-			for (int j=i+1; j<coloring.length; j++) {
-				if (coloring[i] == coloring[j]) {
-					// if the 2 vertices have an edge in between,
-					// then this is not a valid coloring.
-					if (graph.hasEdge(vertex[i], vertex[j])) {
-						return false;
-					}
-				}
-			}
-		}
-		return true;
-	}
+
+  private static boolean isValidColoring(UndirectedGraph graph, Vertex[] vertex, int[] coloring) {
+    for (int i=0; i<coloring.length - 1; i++) {
+      for (int j=i+1; j<coloring.length; j++) {
+        if (coloring[i] == coloring[j]) {
+          // if the 2 vertices have an edge in between,
+          // then this is not a valid coloring.
+          if (graph.hasEdge(vertex[i], vertex[j])) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
 
 	/**
 	 * Returns a map with partition numbers (0 through a max of n)

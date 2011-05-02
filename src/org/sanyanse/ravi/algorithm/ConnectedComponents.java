@@ -13,10 +13,15 @@ public class ConnectedComponents {
     	UndirectedGraph graphCopy = graph.clone();
 
     	do {
-    		DepthFirstTraversal dfs = new DepthFirstTraversal(graphCopy);
+      		DepthFirstTraversal dfs = new DepthFirstTraversal(graphCopy);
     		dfs.traverse();
     		Collection<Vertex> vertices = dfs.getTraversedVertices();
     		if ((vertices != null) && (vertices.size() > 0)) {
+          if (components.size() == 0 && vertices.size() == graph.getNumVertices())
+          {
+            components.add(graphCopy);
+            break;
+          }
     			// Recreate the graph which will be returned.
     			// Create vertices first.
     			UndirectedGraph recreatedComponent = new UndirectedGraph();
