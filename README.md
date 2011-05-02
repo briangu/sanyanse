@@ -2,7 +2,9 @@ What is SanYanSe
 ===============
 ([http://sanyanse.org/](http://sanyanse.org/))
 
-SanYanSe is a competitive 3-coloring solver 'framework'.
+SanYanSe is a competitive 3-coloring solver 'framework'.  All colorers implement Callable and essentially compete to find the solution first.
+
+
 
 ------------------------------------
 
