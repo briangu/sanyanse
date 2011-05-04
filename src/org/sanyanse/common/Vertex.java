@@ -13,8 +13,8 @@ import java.util.Arrays;
 public class Vertex
 {
   public String Id;
-  public int Color;
-  public int[] Edges;
+  public byte Color;
+  public short[] Edges;
 
   public Vertex(Vertex node)
   {
@@ -25,10 +25,10 @@ public class Vertex
 
   public Vertex(String id)
   {
-    this(id, 0);
+    this(id, (byte)0);
   }
 
-  public Vertex(String id, Integer l)
+  public Vertex(String id, byte l)
   {
     Id = id;
     Color = l;

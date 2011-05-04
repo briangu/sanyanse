@@ -20,7 +20,7 @@ public class GraphBuilder
   public final double EdgeProbability;
   public final Vertex[] Vertices;
   public final Map<String, NodeInfo> NodeMap;
-  private int _index = 0;
+  private short _index = 0;
 
   public GraphBuilder(int nodeCnt)
   {
@@ -31,8 +31,8 @@ public class GraphBuilder
   {
     public Vertex Vertex;
     public Set<String> EdgeSet;
-    public int Index;
-    public NodeInfo(Vertex node, Set<String> edgeSet, int index)
+    public short Index;
+    public NodeInfo(Vertex node, Set<String> edgeSet, short index)
     {
       Vertex = node;
       EdgeSet = edgeSet;
@@ -53,7 +53,7 @@ public class GraphBuilder
     return addNode(nodeId, new HashSet<String>(Arrays.asList(edges)));
   }
 
-  public Vertex addNode(String nodeId, Set<String> edges, int color)
+  public Vertex addNode(String nodeId, Set<String> edges, byte color)
   {
     Vertex node = addNode(nodeId, edges);
     node.Color = color;
@@ -74,7 +74,7 @@ public class GraphBuilder
     for (int i = 0; i < NodeCount; i++)
     {
       final NodeInfo info = NodeMap.get(Vertices[i].Id);
-      info.Vertex.Edges = new int[info.EdgeSet.size()];
+      info.Vertex.Edges = new short[info.EdgeSet.size()];
 
       // TODO: we may wan to sort the edges by degree
       int j = 0;

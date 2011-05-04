@@ -110,7 +110,7 @@ public class Graph
     {
       _cache[i] = new Vertex[Vertices[i].Edges.length];
 
-      final int[] row = Vertices[i].Edges;
+      final short[] row = Vertices[i].Edges;
 
       for (int x = row.length - 1; x >= 0; x--)
       {
