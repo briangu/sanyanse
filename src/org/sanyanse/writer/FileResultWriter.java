@@ -31,13 +31,13 @@ public class FileResultWriter implements ColoringResultWriter
       {
         Graph coloredGraph = result.Graph;
 
-        for (Vertex node : coloredGraph.OriginalVertices)
+        for (int i = 0; i < coloredGraph.NodeCount; i++)
         {
           writer.write(
               String.format(
                   "%s:%s\n",
-                  node.Id,
-                  node.Color));
+                  coloredGraph.VertexIds[i],
+                  coloredGraph.OriginalVertices[i].Color));
         }
       }
 

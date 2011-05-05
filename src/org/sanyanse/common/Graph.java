@@ -15,15 +15,18 @@ public class Graph
 {
   public final int NodeCount;
   public final double EdgeProbability;
+  public String[] VertexIds;
   public Vertex[] Vertices;
   public Vertex[] OriginalVertices;
 
   public Graph(
     int nodeCnt,
     double p,
-    Vertex[] nodes)
+    Vertex[] nodes,
+    String[] vertexIds)
   {
     NodeCount = nodeCnt;
+    VertexIds = vertexIds;
     Vertices = nodes;
     EdgeProbability = p;
     OriginalVertices = nodes;
@@ -46,10 +49,12 @@ public class Graph
 
   public Graph clone()
   {
+    String[] newIds = new String[NodeCount];
     Vertex[] newNodes = new Vertex[NodeCount];
 
     for (int i = 0; i < NodeCount; i++)
     {
+      newIds[i] = VertexIds[i];
       newNodes[i] = new Vertex(Vertices[i]);
     }
 
@@ -57,7 +62,8 @@ public class Graph
       new Graph(
         NodeCount,
         EdgeProbability,
-        newNodes);
+        newNodes,
+        newIds);
 
     return copy;
   }

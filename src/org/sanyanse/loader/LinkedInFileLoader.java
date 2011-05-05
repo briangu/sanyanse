@@ -32,7 +32,7 @@ public class LinkedInFileLoader implements GraphLoader
       nodeCnt = Integer.parseInt(br.readLine());
 
       if (nodeCnt == 0) {
-        return new Graph(0, 0, new Vertex[0]);
+        return new Graph(0, 0, new Vertex[0], new String[0]);
       }
 
       builder = new GraphBuilder(nodeCnt);

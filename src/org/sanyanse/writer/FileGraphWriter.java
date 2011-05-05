@@ -37,12 +37,13 @@ public class FileGraphWriter implements GraphSpecWriter
       writer.write(String.format("%s", graph.NodeCount));
       writer.write("\n");
 
-      for (Vertex node : graph.Vertices) {
+      for (int i = 0; i < graph.Vertices.length; i++)
+      {
         writer.write(
             String.format(
                 "%s:%s",
-                node.Id,
-                Util.join(Arrays.asList(node.Edges), ",")));
+                graph.VertexIds[i],
+                Util.join(Arrays.asList(graph.Vertices[i].Edges), ",")));
         writer.write("\n");
       }
 
