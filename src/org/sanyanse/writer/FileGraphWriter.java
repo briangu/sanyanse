@@ -5,11 +5,10 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import org.sanyanse.common.Vertex;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphSpecWriter;
 import org.sanyanse.common.Util;
+import org.sanyanse.common.Vertex;
 
 
 public class FileGraphWriter implements GraphSpecWriter
@@ -36,7 +35,7 @@ public class FileGraphWriter implements GraphSpecWriter
             String.format(
                 "%s:%s",
                 node.Id,
-                Util.join(Arrays.asList(node.Edges), ",")));
+                Util.join(node.Edges, ",")));
         writer.write("\n");
       }
 

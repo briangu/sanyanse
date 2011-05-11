@@ -52,6 +52,19 @@ public class Util
     return builder.toString();
   }
 
+  public static String join(Graph graph, int[] s, String delimiter) {
+    StringBuilder builder = new StringBuilder();
+    for (int i = 0; i < s.length; i++)
+    {
+      builder.append(graph.Vertices[s[i]]);
+      if (i == s.length - 1) {
+        continue;
+      }
+      builder.append(delimiter);
+    }
+    return builder.toString();
+  }
+
   public static <T> Set<T> intersect(Set<T> s1, Set<T> s2)
   {
     Set<T> intersection = new HashSet<T>(s1);

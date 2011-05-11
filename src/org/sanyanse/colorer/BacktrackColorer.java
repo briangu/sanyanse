@@ -34,6 +34,8 @@ public class BacktrackColorer implements GraphColorer
     {
       while ((arr[k].Color <= 2) && !cur.isInterrupted())
       {
+        System.out.println(k);
+
         arr[k].Color += 1;
 
         Graph.ColorState state = _graph.analyzeState();
