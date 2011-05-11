@@ -35,7 +35,7 @@ public class FileGraphWriter implements GraphSpecWriter
             String.format(
                 "%s:%s",
                 node.Id,
-                Util.join(node.Edges, ",")));
+                Util.join(graph, node.Edges, ",")));
         writer.write("\n");
       }
 
