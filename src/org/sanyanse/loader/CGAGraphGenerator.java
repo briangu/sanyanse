@@ -39,13 +39,19 @@ public class CGAGraphGenerator implements GraphLoader
   {
     Random rnd = new Random(_seed);
     int nodeCnt = Math.max(rnd.nextInt(_maxNodes), _minNodes);
-    ProbabilityInfo info = buildProbabalisticGraph(rnd, nodeCnt, _connectionPercent, 0.5f);
+    ProbabilityInfo info = buildProbabalisticGraph(rnd, 1024, _connectionPercent, 0.5f);
     SearchCost winner;
     Graph graph = null;
     try
     {
-      winner = search(info, _maxIterations);
-      graph = generateGraph(info, winner.Vector);
+      for (int i = 0; i < _maxIterations; i++)
+      {
+        winner = search(info, 10);
+        graph = generateGraph(info, winner.Vector);
+        System.out.print("adding nodes...");
+        info = addNodes(info, 10, _connectionPercent, 0.5f);
+        System.out.println("new node cnt: " + info.NodeCount);
+      }
     }
     catch(Exception e)
     {
@@ -284,9 +290,8 @@ public class CGAGraphGenerator implements GraphLoader
     return map;
   }
 
-  private ProbabilityInfo buildProbabalisticGraph(Random rnd, int nodeCount, float connectionPercent, float initProb)
+  private ProbabilityInfo buildProbabalisticGraph(Random rnd, int nodeCnt, float connectionPercent, float initProb)
   {
-    int nodeCnt = Math.max(rnd.nextInt(_maxNodes), _minNodes);
     int bucketSize = (int)(nodeCnt / 3);
 
     List<Map<String, Set<ProbabilitySwitch>>> buckets = new ArrayList<Map<String, Set<ProbabilitySwitch>>>(3);
@@ -314,9 +319,67 @@ public class CGAGraphGenerator implements GraphLoader
     mapProbabilitySwitches(switches, buckets.get(1), buckets.get(2), connectionPercent, initProb);
 
     ProbabilityInfo info = new ProbabilityInfo();
-    info.NodeCount = nodeCount;
+    info.NodeCount = nodeCnt;
     info.ProbGraph = buckets;
     info.Vector = new ArrayList(switches);
+
+    return info;
+  }
+
+  private ProbabilityInfo addNodes(
+    ProbabilityInfo info,
+    int newNodeCnt,
+    float connectionPercent,
+    float initProb)
+  {
+    HashSet switches = new HashSet(info.Vector);
+
+    int nodeCount = info.NodeCount;
+
+    List<Map<String, Set<ProbabilitySwitch>>> buckets = new ArrayList<Map<String, Set<ProbabilitySwitch>>>(3);
+    buckets.add(new HashMap<String, Set<ProbabilitySwitch>>(info.ProbGraph.get(0)));
+    for (String k : info.ProbGraph.get(0).keySet())
+    {
+      buckets.get(0).put(k, new HashSet<ProbabilitySwitch>(info.ProbGraph.get(0).get(k)));
+    }
+    buckets.add(new HashMap<String, Set<ProbabilitySwitch>>(info.ProbGraph.get(1)));
+    for (String k : info.ProbGraph.get(1).keySet())
+    {
+      buckets.get(1).put(k, new HashSet<ProbabilitySwitch>(info.ProbGraph.get(1).get(k)));
+    }
+    buckets.add(new HashMap<String, Set<ProbabilitySwitch>>(info.ProbGraph.get(2)));
+    for (String k : info.ProbGraph.get(2).keySet())
+    {
+      buckets.get(2).put(k, new HashSet<ProbabilitySwitch>(info.ProbGraph.get(2).get(k)));
+    }
+
+    Random r = new Random();
+
+    for (int i = 0; i < newNodeCnt; i++)
+    {
+      String nodeId = Util.getNodeName(nodeCount++);
+      Set<ProbabilitySwitch> edges  = new HashSet<ProbabilitySwitch>();
+      buckets.get(0).put(nodeId, edges);
+      addNeighbors(r, switches, nodeId, edges, buckets.get(1), connectionPercent, initProb);
+      addNeighbors(r, switches, nodeId, edges, buckets.get(2), connectionPercent, initProb);
+
+      nodeId = Util.getNodeName(nodeCount++);
+      edges  = new HashSet<ProbabilitySwitch>();
+      buckets.get(1).put(nodeId, edges);
+      addNeighbors(r, switches, nodeId, edges, buckets.get(0), connectionPercent, initProb);
+      addNeighbors(r, switches, nodeId, edges, buckets.get(2), connectionPercent, initProb);
+
+      nodeId = Util.getNodeName(nodeCount++);
+      edges  = new HashSet<ProbabilitySwitch>();
+      buckets.get(2).put(nodeId, edges);
+      addNeighbors(r, switches, nodeId, edges, buckets.get(0), connectionPercent, initProb);
+      addNeighbors(r, switches, nodeId, edges, buckets.get(1), connectionPercent, initProb);
+    }
+
+    info = new ProbabilityInfo();
+    info.NodeCount = nodeCount - 1;
+    info.ProbGraph = buckets;
+    info.Vector = new ArrayList<ProbabilitySwitch>(switches);
 
     return info;
   }
@@ -333,17 +396,27 @@ public class CGAGraphGenerator implements GraphLoader
 
     for (String a : bucketA.keySet())
     {
-      Set<ProbabilitySwitch> setA = bucketA.get(a);
+      addNeighbors(r, switches, a, bucketA.get(a), bucketB, connectionPercent, initProb);
+    }
+  }
 
-      for (String b : bucketB.keySet())
-      {
-        if (r.nextFloat() > connectionPercent) continue;
+  private void addNeighbors(
+    Random rnd,
+    Set<ProbabilitySwitch> switches,
+    String a,
+    Set<ProbabilitySwitch> setA,
+    Map<String, Set<ProbabilitySwitch>> bucketB,
+    float connectionPercent,
+    float initProb)
+  {
+    for (String b : bucketB.keySet())
+    {
+      if (rnd.nextFloat() > connectionPercent) continue;
 
-        ProbabilitySwitch ps = new ProbabilitySwitch(a, b, initProb);
-        switches.add(ps);
-        setA.add(ps);
-        bucketB.get(b).add(ps);
-      }
+      ProbabilitySwitch ps = new ProbabilitySwitch(a, b, initProb);
+      switches.add(ps);
+      setA.add(ps);
+      bucketB.get(b).add(ps);
     }
   }
 
