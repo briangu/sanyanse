@@ -7,14 +7,39 @@
 package org.sanyanse.common;
 
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 
 public class Util
 {
+  static Map<Integer, String> idMap = new HashMap<Integer, String>();
+
+  public static String getNodeName(int id) {
+    int origId = id;
+
+    synchronized (idMap) {
+      if (idMap.containsKey(id)) {
+        return idMap.get(id);
+      }
+    }
+
+    StringBuilder sb = new StringBuilder();
+
+    while (id > 0) {
+      int digit = ((id - 1) % 26);
+      sb.append((char)('A' + (char)digit));
+      id = (id - 1) / 26;
+    }
+
+    String name = sb.reverse().toString();
+
+    synchronized (idMap) {
+      idMap.put(origId, name);
+    }
+
+    return name;
+  }
+
   public static String join(Collection<?> s, String delimiter) {
     StringBuilder builder = new StringBuilder();
     Iterator iter = s.iterator();
@@ -28,11 +53,11 @@ public class Util
     return builder.toString();
   }
 
-  public static String join(int[] s, String delimiter) {
+  public static String join(Graph graph, int[] s, String delimiter) {
     StringBuilder builder = new StringBuilder();
     for (int i = 0; i < s.length; i++)
     {
-      builder.append(Integer.toString(s[i]));
+      builder.append(graph.Vertices[s[i]].Id);
       if (i == s.length - 1) {
         continue;
       }
