@@ -47,6 +47,7 @@ public class CGAGraphGenerator implements GraphLoader
       for (int i = 0; i < _maxIterations; i++)
       {
         winner = search(info, 10);
+        if (winner == null) continue;
         graph = generateGraph(info, winner.Vector);
         System.out.print("adding nodes...");
         info = addNodes(info, 10, _connectionPercent, 0.5f);
@@ -214,8 +215,10 @@ public class CGAGraphGenerator implements GraphLoader
 
       System.out.println("compute time: " + sw.getDuration());
 
+      if (result == null || !result.IsColored) return null;
+
       SearchCost sc = new SearchCost();
-      sc.Cost = result != null && result.IsColored ? 1 / (float)(sw.getDuration() / 1000): 0f;
+      sc.Cost = 1 / (float)(sw.getDuration() / 1000);
       sc.Vector = vector;
       sc.Graph = graph;
 
@@ -332,26 +335,9 @@ public class CGAGraphGenerator implements GraphLoader
     float connectionPercent,
     float initProb)
   {
-    HashSet switches = new HashSet(info.Vector);
-
     int nodeCount = info.NodeCount;
-
-    List<Map<String, Set<ProbabilitySwitch>>> buckets = new ArrayList<Map<String, Set<ProbabilitySwitch>>>(3);
-    buckets.add(new HashMap<String, Set<ProbabilitySwitch>>(info.ProbGraph.get(0)));
-    for (String k : info.ProbGraph.get(0).keySet())
-    {
-      buckets.get(0).put(k, new HashSet<ProbabilitySwitch>(info.ProbGraph.get(0).get(k)));
-    }
-    buckets.add(new HashMap<String, Set<ProbabilitySwitch>>(info.ProbGraph.get(1)));
-    for (String k : info.ProbGraph.get(1).keySet())
-    {
-      buckets.get(1).put(k, new HashSet<ProbabilitySwitch>(info.ProbGraph.get(1).get(k)));
-    }
-    buckets.add(new HashMap<String, Set<ProbabilitySwitch>>(info.ProbGraph.get(2)));
-    for (String k : info.ProbGraph.get(2).keySet())
-    {
-      buckets.get(2).put(k, new HashSet<ProbabilitySwitch>(info.ProbGraph.get(2).get(k)));
-    }
+    HashSet switches = new HashSet(info.Vector);
+    List<Map<String, Set<ProbabilitySwitch>>> buckets = info.ProbGraph;
 
     Random r = new Random();
 
@@ -376,7 +362,6 @@ public class CGAGraphGenerator implements GraphLoader
       addNeighbors(r, switches, nodeId, edges, buckets.get(1), connectionPercent, initProb);
     }
 
-    info = new ProbabilityInfo();
     info.NodeCount = nodeCount - 1;
     info.ProbGraph = buckets;
     info.Vector = new ArrayList<ProbabilitySwitch>(switches);
