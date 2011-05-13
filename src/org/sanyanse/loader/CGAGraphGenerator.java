@@ -11,23 +11,17 @@ import java.util.concurrent.*;
 public class CGAGraphGenerator implements GraphLoader
 {
   float _connectionPercent;
-  int _minNodes;
   int _maxNodes;
   long _seed;
   int _maxIterations;
   int _maxWorkers;
 
   public CGAGraphGenerator(int maxNodes, float connectionPercent, int maxIterations, int maxWorkers) {
-    this(maxNodes, maxNodes, connectionPercent, maxIterations, maxWorkers, System.currentTimeMillis());
+    this(maxNodes, connectionPercent, maxIterations, maxWorkers, System.currentTimeMillis());
   }
 
-  public CGAGraphGenerator(int maxNodes, int minNodes, float colorablePercent, int maxIterations, int maxWorkers, long seed) {
+  public CGAGraphGenerator(int maxNodes, float colorablePercent, int maxIterations, int maxWorkers, long seed) {
     _maxNodes = maxNodes;
-    _minNodes = minNodes;
-    if (_maxNodes < _minNodes) {
-      throw new IllegalArgumentException(String.format("max nodes must be greater than %s", Integer.toString(_minNodes)));
-    }
-
     _maxIterations = maxIterations;
     _connectionPercent = colorablePercent;
     _seed = seed;
@@ -38,20 +32,9 @@ public class CGAGraphGenerator implements GraphLoader
   public Graph load()
   {
     Random rnd = new Random(_seed);
-    int nodeCnt = Math.max(rnd.nextInt(_maxNodes), _minNodes);
-    ProbabilityInfo info = buildProbabalisticGraph(rnd, nodeCnt, _connectionPercent, 0.5f);
-    SearchResult winner;
-    Graph graph = null;
-    try
-    {
-      winner = search(info, _maxIterations);
-      graph = generateGraph(info, winner.Vector);
-    }
-    catch(Exception e)
-    {
-      e.printStackTrace();
-    }
-    return graph;
+    ProbabilityInfo info = buildProbabalisticGraph(rnd, _maxNodes, _connectionPercent, 0.5f);
+    SearchResult winner = search(info, _maxIterations);
+    return winner != null ? winner.Graph : null;
   }
 
   private SearchResult search(ProbabilityInfo info, int maxIterations)
@@ -87,7 +70,6 @@ public class CGAGraphGenerator implements GraphLoader
         if (best.Graph != null)
         {
           FileGraphWriter.create(String.format("best_%s_%s.col", info.NodeCount, i)).write(best.Graph);
-//          best.Graph = null;
         }
       }
 
@@ -104,7 +86,7 @@ public class CGAGraphGenerator implements GraphLoader
   {
     CompletionService<SearchResult> ecs = new ExecutorCompletionService<SearchResult>(executor);
 
-    List<Future<SearchResult>> futures = new ArrayList<Future<SearchResult>>(2);
+    List<Future<SearchResult>> futures = new ArrayList<Future<SearchResult>>(_maxWorkers);
 
     List<CGAWorker> workers = new ArrayList<CGAWorker>();
     for (int i = 0; i < _maxWorkers; i++)
@@ -289,9 +271,8 @@ public class CGAGraphGenerator implements GraphLoader
     return map;
   }
 
-  private ProbabilityInfo buildProbabalisticGraph(Random rnd, int nodeCount, float connectionPercent, float initProb)
+  private ProbabilityInfo buildProbabalisticGraph(Random rnd, int nodeCnt, float connectionPercent, float initProb)
   {
-    int nodeCnt = Math.max(rnd.nextInt(_maxNodes), _minNodes);
     int bucketSize = (int)(nodeCnt / 3);
 
     List<Map<String, Set<ProbabilitySwitch>>> buckets = new ArrayList<Map<String, Set<ProbabilitySwitch>>>(3);
@@ -317,7 +298,7 @@ public class CGAGraphGenerator implements GraphLoader
     mapProbabilitySwitches(switches, buckets.get(1), buckets.get(2), connectionPercent * 0.5f, initProb);
 
     ProbabilityInfo info = new ProbabilityInfo();
-    info.NodeCount = nodeCount;
+    info.NodeCount = nodeCnt;
     info.ProbGraph = buckets;
     info.Vector = new ArrayList(switches);
 
@@ -336,17 +317,27 @@ public class CGAGraphGenerator implements GraphLoader
 
     for (String a : bucketA.keySet())
     {
-      Set<ProbabilitySwitch> setA = bucketA.get(a);
+      addNeighbors(r, switches, a, bucketA.get(a), bucketB, connectionPercent, initProb);
+    }
+  }
 
-      for (String b : bucketB.keySet())
-      {
-        if (r.nextFloat() > connectionPercent) continue;
+  private void addNeighbors(
+    Random rnd,
+    Set<ProbabilitySwitch> switches,
+    String a,
+    Set<ProbabilitySwitch> setA,
+    Map<String, Set<ProbabilitySwitch>> bucketB,
+    float connectionPercent,
+    float initProb)
+  {
+    for (String b : bucketB.keySet())
+    {
+      if (rnd.nextFloat() > connectionPercent) continue;
 
-        ProbabilitySwitch ps = new ProbabilitySwitch(a, b, initProb);
-        switches.add(ps);
-        setA.add(ps);
-        bucketB.get(b).add(ps);
-      }
+      ProbabilitySwitch ps = new ProbabilitySwitch(a, b, initProb);
+      switches.add(ps);
+      setA.add(ps);
+      bucketB.get(b).add(ps);
     }
   }
 
