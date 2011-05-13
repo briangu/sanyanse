@@ -40,7 +40,7 @@ public class CGAGraphGenerator implements GraphLoader
     Random rnd = new Random(_seed);
     int nodeCnt = Math.max(rnd.nextInt(_maxNodes), _minNodes);
     ProbabilityInfo info = buildProbabalisticGraph(rnd, nodeCnt, _connectionPercent, 0.5f);
-    SearchCost winner;
+    SearchResult winner;
     Graph graph = null;
     try
     {
@@ -54,59 +54,57 @@ public class CGAGraphGenerator implements GraphLoader
     return graph;
   }
 
-  private class SearchCost
+  private SearchResult search(ProbabilityInfo info, int maxIterations)
   {
-    public float Cost;
-    public List<Boolean> Vector;
-    public Graph Graph;
-  }
-
-  private SearchCost search(ProbabilityInfo info, int maxIterations)
-  {
-    SearchCost best = null;
-
-    ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    SearchResult best = null;
 
     for (int i = 0; i < maxIterations; i++)
     {
-      List<SearchCost> result = parallelizeCalls(executor, info);
-      if (result.size() != 2)
+      System.out.println("generation: " + i);
+
+      ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+      List<SearchResult> result = parallelizeCalls(executor, info);
+      if (result.size() < 2)
       {
         System.out.println("missing result! i = " + i);
         continue;
       }
 
-      SearchCost costA = result.get(0);
-      SearchCost costB = result.get(1);
+      SearchResult resultA = result.get(0);
+      SearchResult resultB = result.get(1);
 
-      List<Boolean> winner = costA.Cost > costB.Cost ? costA.Vector : costB.Vector;
-      List<Boolean> loser = costA.Cost > costB.Cost ? costB.Vector : costA.Vector;
-      SearchCost winningCost = costA.Cost > costB.Cost ? costA : costB;
+      List<Boolean> winner = resultA.Cost > resultB.Cost ? resultA.Vector : resultB.Vector;
+      List<Boolean> loser = resultA.Cost > resultB.Cost ? resultB.Vector : resultA.Vector;
+      SearchResult winningResult = resultA.Cost < resultB.Cost ? resultA : resultB;
 
-      if (best == null || winningCost.Cost > best.Cost)
+      System.out.println("winningResult cost: " + winningResult.Cost);
+
+      if (best == null || winningResult.Cost < best.Cost)
       {
-        best = winningCost;
+        best = winningResult;
         System.out.println("new best cost: " + best.Cost);
         if (best.Graph != null)
         {
           FileGraphWriter.create(String.format("best_%s_%s.col", info.NodeCount, i)).write(best.Graph);
-          best.Graph = null;
+//          best.Graph = null;
         }
       }
+
+      // horrible barrier hack
+      executor.shutdown();
 
       updateVector(info, winner, loser);
     }
 
-    executor.shutdown();
-
     return best;
   }
 
-  private List<SearchCost> parallelizeCalls(ExecutorService executor, ProbabilityInfo info)
+  private List<SearchResult> parallelizeCalls(ExecutorService executor, ProbabilityInfo info)
   {
-    CompletionService<SearchCost> ecs = new ExecutorCompletionService<SearchCost>(executor);
+    CompletionService<SearchResult> ecs = new ExecutorCompletionService<SearchResult>(executor);
 
-    List<Future<SearchCost>> futures = new ArrayList<Future<SearchCost>>(2);
+    List<Future<SearchResult>> futures = new ArrayList<Future<SearchResult>>(2);
 
     List<CGAWorker> workers = new ArrayList<CGAWorker>();
     for (int i = 0; i < _maxWorkers; i++)
@@ -114,23 +112,26 @@ public class CGAGraphGenerator implements GraphLoader
       workers.add(new CGAWorker(info));
     }
 
-    List<SearchCost> result = new ArrayList<SearchCost>();
+    List<SearchResult> result = new ArrayList<SearchResult>();
 
     try
     {
-      for (Callable<SearchCost> s : workers)
+      for (Callable<SearchResult> s : workers)
       {
         futures.add(ecs.submit(s));
       }
 
-      for (int i = 0; i < 2; ++i)
+      int j = futures.size();
+      while (result.size() < 2 && j > 0)
       {
         try
         {
-          SearchCost r = ecs.take().get();
+          SearchResult r = ecs.take().get();
+          j--;
           if (r == null)
           {
-            break;
+            System.out.println("a job failed");
+            continue;
           }
           result.add(r);
         }
@@ -144,7 +145,7 @@ public class CGAGraphGenerator implements GraphLoader
     }
     finally
     {
-      for (Future<SearchCost> f : futures)
+      for (Future<SearchResult> f : futures)
       {
         f.cancel(true);
       }
@@ -155,9 +156,7 @@ public class CGAGraphGenerator implements GraphLoader
 
   private void updateVector(ProbabilityInfo info, List<Boolean> winner, List<Boolean> loser)
   {
-//    float delta = 1 / (float)(info.NodeCount);
-
-    float delta = 0.10f;
+    float delta = Math.max(100 / (float)(info.NodeCount), 0.1f);
 
     for (int i = 0; i < winner.size(); i++)
     {
@@ -175,7 +174,7 @@ public class CGAGraphGenerator implements GraphLoader
     }
   }
 
-  private class CGAWorker implements Callable<SearchCost>
+  private class CGAWorker implements Callable<SearchResult>
   {
     ProbabilityInfo _info;
 
@@ -185,16 +184,20 @@ public class CGAGraphGenerator implements GraphLoader
     }
 
     @Override
-    public SearchCost call() throws Exception
+    public SearchResult call() throws Exception
     {
+      System.out.print("generating candidate..." + Thread.currentThread().getId());
       List<Boolean> vector = generateCandidate(_info);
+      System.out.println("done." + Thread.currentThread().getId());
 
       Graph graph = null;
       ColoringResult result = null;
       StopWatch sw = new StopWatch();
 
       try {
+        System.out.print("generating graph..." + Thread.currentThread().getId());
         graph = generateGraph(_info, vector);
+        System.out.println("done." + Thread.currentThread().getId());
         graph.SortByEdgeCount();
         GraphColorer colorer = new BacktrackColorer(graph);
         sw.start();
@@ -206,17 +209,19 @@ public class CGAGraphGenerator implements GraphLoader
         e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
 
-      System.out.println("compute time: " + sw.getDuration());
+      System.out.println("compute time: " + sw.getDuration() + " " + Thread.currentThread().getId());
 
-      SearchCost sc = new SearchCost();
-      sc.Cost = result != null && result.IsColored ? 1 / (float)(sw.getDuration() / 1000): 0f;
+      SearchResult sc = new SearchResult();
+      sc.Cost = result != null && !result.IsColored ? (float)(sw.getDuration() / 1000): 0f;
       sc.Vector = vector;
       sc.Graph = graph;
+      sc.ColoringResult = result;
+
+      System.out.println("cost: " + sc.Cost + " " + Thread.currentThread().getId());
 
       return sc;
     }
   }
-
 
   private List<Boolean> generateCandidate(ProbabilityInfo info)
   {
@@ -307,11 +312,9 @@ public class CGAGraphGenerator implements GraphLoader
     HashSet<ProbabilitySwitch> switches = new HashSet<ProbabilitySwitch>();
 
     // setup shared edge objects for unidirectional edges
-    for (int j = 1; j <= 2; j++)
-    {
-      mapProbabilitySwitches(switches, buckets.get(0), buckets.get(j), connectionPercent, initProb);
-    }
-    mapProbabilitySwitches(switches, buckets.get(1), buckets.get(2), connectionPercent, initProb);
+    mapProbabilitySwitches(switches, buckets.get(0), buckets.get(1), 1.0f, initProb);
+    mapProbabilitySwitches(switches, buckets.get(0), buckets.get(2), connectionPercent, initProb);
+    mapProbabilitySwitches(switches, buckets.get(1), buckets.get(2), connectionPercent * 0.5f, initProb);
 
     ProbabilityInfo info = new ProbabilityInfo();
     info.NodeCount = nodeCount;
@@ -345,6 +348,14 @@ public class CGAGraphGenerator implements GraphLoader
         bucketB.get(b).add(ps);
       }
     }
+  }
+
+  private class SearchResult
+  {
+    public float Cost;
+    public List<Boolean> Vector;
+    public Graph Graph;
+    public ColoringResult ColoringResult;
   }
 
   private class ProbabilityInfo

@@ -53,11 +53,11 @@ public class Util
     return builder.toString();
   }
 
-  public static String join(Graph graph, int[] s, String delimiter) {
+  public static String join(Graph graph, short[] s, String delimiter) {
     StringBuilder builder = new StringBuilder();
     for (int i = 0; i < s.length; i++)
     {
-      builder.append(graph.Vertices[s[i]].Id);
+      builder.append(graph.VertexIds[s[i]]);
       if (i == s.length - 1) {
         continue;
       }

@@ -15,15 +15,18 @@ public class Graph
 {
   public final int NodeCount;
   public final double EdgeProbability;
+  public String[] VertexIds;
   public Vertex[] Vertices;
   public Vertex[] OriginalVertices;
 
   public Graph(
     int nodeCnt,
     double p,
-    Vertex[] nodes)
+    Vertex[] nodes,
+    String[] vertexIds)
   {
     NodeCount = nodeCnt;
+    VertexIds = vertexIds;
     Vertices = nodes;
     EdgeProbability = p;
     OriginalVertices = nodes;
@@ -46,10 +49,12 @@ public class Graph
 
   public Graph clone()
   {
+    String[] newIds = new String[NodeCount];
     Vertex[] newNodes = new Vertex[NodeCount];
 
     for (int i = 0; i < NodeCount; i++)
     {
+      newIds[i] = VertexIds[i];
       newNodes[i] = new Vertex(Vertices[i]);
     }
 
@@ -57,7 +62,8 @@ public class Graph
       new Graph(
         NodeCount,
         EdgeProbability,
-        newNodes);
+        newNodes,
+        newIds);
 
     return copy;
   }
@@ -73,11 +79,6 @@ public class Graph
 
   public ColorState analyzeState()
   {
-    if (_cache == null)
-    {
-      buildCache();
-    }
-
     ColorState state = ColorState.Complete;
 
     for (int i = NodeCount - 1; i >= 0; i--)
@@ -89,11 +90,11 @@ public class Graph
         continue;
       }
 
-      final Vertex[] edges = _cache[i];
+      final short[] edges = Vertices[i].Edges;
 
       for (int x = edges.length - 1; x >= 0; x--)
       {
-        if (edges[x].Color == color)
+        if (Vertices[edges[x]].Color == color)
         {
           return ColorState.Invalid;
         }
@@ -110,7 +111,7 @@ public class Graph
     {
       _cache[i] = new Vertex[Vertices[i].Edges.length];
 
-      final int[] row = Vertices[i].Edges;
+      final short[] row = Vertices[i].Edges;
 
       for (int x = row.length - 1; x >= 0; x--)
       {

@@ -8,14 +8,12 @@ package org.sanyanse.writer;
 
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import org.sanyanse.common.Graph;
 import org.sanyanse.common.GraphSpecWriter;
 import org.sanyanse.common.Util;
-import org.sanyanse.common.Vertex;
 
 
 public class FileGraphWriter implements GraphSpecWriter
@@ -37,12 +35,12 @@ public class FileGraphWriter implements GraphSpecWriter
       writer.write(String.format("%s", graph.NodeCount));
       writer.write("\n");
 
-      for (Vertex node : graph.Vertices) {
+      for (int i = 0; i < graph.Vertices.length; i++) {
         writer.write(
             String.format(
                 "%s:%s",
-                node.Id,
-                Util.join(graph, node.Edges, ",")));
+                graph.VertexIds[i],
+                Util.join(graph, graph.Vertices[i].Edges, ",")));
         writer.write("\n");
       }
 

@@ -1,12 +1,14 @@
 package org.sanyanse;
 
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import org.sanyanse.common.Graph;
-import org.sanyanse.common.GraphLoader;
-import org.sanyanse.loader.LinkedInFileLoader;
-import org.sanyanse.writer.FileGraphWriter;
 
 
 /**
@@ -31,22 +33,54 @@ public class Shuffle
     System.out.println(readFile);
     System.out.println(outfile);
 
-    GraphLoader loader = LinkedInFileLoader.create(readFile);
-    Graph graph = loader.load();
-    if (graph == null)
-    {
-      System.out.println("failed to load graph");
-      return;
+    int nodeCnt = -1;
+
+    String[] arr = null;
+    int i = 0;
+
+    try {
+      FileReader fstream = new FileReader(readFile);
+      BufferedReader br = new BufferedReader(fstream);
+
+      nodeCnt = Integer.parseInt(br.readLine());
+
+      arr = new String[nodeCnt];
+
+      String strLine;
+
+      while ((strLine = br.readLine()) != null) {
+        arr[i++] = strLine;
+      }
+
+      br.close();
+    } catch (Exception e) {
+      System.err.println("Error: " + e.getMessage());
     }
 
-    shuffle(graph);
+    Collections.shuffle(Arrays.asList(arr));
 
-    FileGraphWriter.create(outfile).write(graph);
-  }
+    try
+    {
+      FileWriter fstream = new FileWriter(outfile);
+      BufferedWriter writer = new BufferedWriter(fstream);
 
-  public static void shuffle(Graph graph)
-  {
-    if (graph.NodeCount == 0) return;
-    Collections.shuffle(Arrays.asList(graph.Vertices));
+      writer.write(String.format("%s", nodeCnt));
+      writer.write("\n");
+
+      for (i = 0; i < nodeCnt; i++) {
+        writer.write(arr[i]);
+        writer.write("\n");
+      }
+
+      writer.close();
+    }
+    catch (FileNotFoundException e)
+    {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
   }
 }

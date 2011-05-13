@@ -18,9 +18,10 @@ public class GraphBuilder
 {
   public final int NodeCount;
   public final double EdgeProbability;
+  public final String[] VertexIds;
   public final Vertex[] Vertices;
   public final Map<String, NodeInfo> NodeMap;
-  private int _index = 0;
+  private short _index = 0;
 
   public GraphBuilder(int nodeCnt)
   {
@@ -31,8 +32,8 @@ public class GraphBuilder
   {
     public Vertex Vertex;
     public Set<String> EdgeSet;
-    public int Index;
-    public NodeInfo(Vertex node, Set<String> edgeSet, int index)
+    public short Index;
+    public NodeInfo(Vertex node, Set<String> edgeSet, short index)
     {
       Vertex = node;
       EdgeSet = edgeSet;
@@ -44,6 +45,7 @@ public class GraphBuilder
   {
     NodeCount = nodeCnt;
     EdgeProbability = p;
+    VertexIds = new String[nodeCnt];
     Vertices = new Vertex[nodeCnt];
     NodeMap = new HashMap<String, NodeInfo>(nodeCnt);
   }
@@ -53,7 +55,7 @@ public class GraphBuilder
     return addNode(nodeId, new HashSet<String>(Arrays.asList(edges)));
   }
 
-  public Vertex addNode(String nodeId, Set<String> edges, int color)
+  public Vertex addNode(String nodeId, Set<String> edges, byte color)
   {
     Vertex node = addNode(nodeId, edges);
     node.Color = color;
@@ -62,9 +64,10 @@ public class GraphBuilder
 
   public Vertex addNode(String nodeId, Set<String> edges)
   {
-    Vertex node = new Vertex(nodeId);
+    Vertex node = new Vertex();
+    VertexIds[_index] = nodeId;
     Vertices[_index] = node;
-    NodeMap.put(node.Id, new NodeInfo(node, edges, _index));
+    NodeMap.put(nodeId, new NodeInfo(node, edges, _index));
     _index++;
     return node;
   }
@@ -73,8 +76,8 @@ public class GraphBuilder
   {
     for (int i = 0; i < NodeCount; i++)
     {
-      final NodeInfo info = NodeMap.get(Vertices[i].Id);
-      info.Vertex.Edges = new int[info.EdgeSet.size()];
+      final NodeInfo info = NodeMap.get(VertexIds[i]);
+      info.Vertex.Edges = new short[info.EdgeSet.size()];
 
       // TODO: we may wan to sort the edges by degree
       int j = 0;
@@ -82,11 +85,9 @@ public class GraphBuilder
       {
         info.Vertex.Edges[j++] = NodeMap.get(id).Index;
       }
-
-//      Arrays.sort(info.Vertex.Edges);
     }
 
-    Graph graph = new Graph(NodeCount, EdgeProbability, Vertices);
+    Graph graph = new Graph(NodeCount, EdgeProbability, Vertices, VertexIds);
 
     return graph;
   }
